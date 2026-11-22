@@ -19,7 +19,7 @@
          <children>
             <Label text="RANKING DE TORNEO" />
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" text="REGRESAR" />
+            <Button fx:id="btnRegresar" mnemonicParsing="false" onAction="#onClickRegresar" text="REGRESAR" />
          </children>
          <padding>
             <Insets bottom="14.0" />
@@ -33,12 +33,12 @@
          </padding>
          <children>
             <Label styleClass="ranking-subtitulo" text="MEJORES GUERREROS" />
-            <TableView prefHeight="200.0" prefWidth="200.0" styleClass="ranking-tabla" VBox.vgrow="ALWAYS">
+            <TableView fx:id="TablaGuerreros" prefHeight="200.0" prefWidth="200.0" styleClass="ranking-tabla" VBox.vgrow="ALWAYS">
               <columns>
-                <TableColumn prefWidth="141.0" text="POSICIÓN" />
-                <TableColumn minWidth="9.0" prefWidth="125.0" text="GUERRERO" />
-                  <TableColumn minWidth="0.0" prefWidth="139.0" text="VICTORIAS" />
-                  <TableColumn prefWidth="118.0" text="RANGO" />
+                <TableColumn fx:id="ColPos" prefWidth="141.0" text="POSICIÓN" />
+                <TableColumn fx:id="ColGuerrero" minWidth="9.0" prefWidth="125.0" text="GUERRERO" />
+                  <TableColumn fx:id="colVictorias" minWidth="0.0" prefWidth="139.0" text="VICTORIAS" />
+                  <TableColumn fx:id="colRangos" prefWidth="118.0" text="RANGO" />
               </columns>
             </TableView>
          </children>
