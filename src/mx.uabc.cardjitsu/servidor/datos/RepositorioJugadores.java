@@ -1,4 +1,4 @@
-package mx.uabc.cardjitsu.sevidor.datos;
+package servidor.datos;
 
 public class RepositorioJugadores {
     

@@ -9,7 +9,6 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="lobby-root" stylesheets="@lobby.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="12.0" BorderPane.alignment="CENTER">
@@ -17,10 +16,10 @@
             <Insets bottom="15.0" />
          </padding>
          <children>
-            <Label styleClass="lobby-texto" text="Guerrero: ---" />
-            <Label styleClass="lobby-rango" text="Rango: ---" />
+            <Label fx:id="lblGuerrero" styleClass="lobby-texto" text="Guerrero: ---" />
+            <Label fx:id="lblRango" styleClass="lobby-rango" text="Rango: ---" />
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" styleClass="btn-ranking" text="RAKING" />
+            <Button fx:id="btnRanking" mnemonicParsing="false" onAction="#onClickRanking" styleClass="btn-ranking" text="RAKING" />
          </children>
       </HBox>
    </top>
@@ -28,7 +27,7 @@
       <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" styleClass="lobby-panel" BorderPane.alignment="CENTER">
          <children>
             <Label styleClass="lobby-titulo-seccion" text="SALAS DISPONIBLES" />
-            <ListView prefHeight="200.0" prefWidth="200.0" styleClass="lobby-lista" VBox.vgrow="ALWAYS" />
+            <ListView fx:id="LvSalas" prefHeight="200.0" prefWidth="200.0" styleClass="lobby-lista" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
    </center>
@@ -40,11 +39,11 @@
          <children>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="16.0">
                <children>
-                  <Button mnemonicParsing="false" styleClass="btn-crear" text="CREAR SALA" />
-                  <Button mnemonicParsing="false" styleClass="btn-unirse" text="UNIRSE A SALA" />
+                  <Button fx:id="btnCrearSalas" mnemonicParsing="false" onAction="#onClickCrear" styleClass="btn-crear" text="CREAR SALA" />
+                  <Button fx:id="btnUnirse" mnemonicParsing="false" onAction="#onClickUnirse" styleClass="btn-unirse" text="UNIRSE A SALA" />
                </children>
             </HBox>
-            <Label styleClass="lobby-estado" wrapText="true" />
+            <Label fx:id="lblEstadodeSala" styleClass="lobby-estado" wrapText="true" />
          </children>
       </VBox>
    </bottom>

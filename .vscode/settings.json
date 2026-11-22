@@ -2,6 +2,18 @@
     "java.project.sourcePaths": ["src/mx.uabc.cardjitsu"],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
+        "lib/**/*.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\db4o.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\javafx.base.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\javafx.controls.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\javafx.fxml.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\javafx.graphics.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\javafx.media.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\javafx.swing.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\javafx.web.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\javafx-swt.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\jdk.jsobject.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\jfx.incubator.input.jar",
+        "c:\\Users\\Leo\\Downloads\\fxmp\\javafx-sdk(REAL)-26.0.2\\javafx-sdk-26.0.2\\lib\\jfx.incubator.richtext.jar"
     ]
 }
