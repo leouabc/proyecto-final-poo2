@@ -1,0 +1,53 @@
+.espera-root {
+    -fx-background-color: linear-gradient(to bottom right, #081229, #102554, #1b1438);
+}
+
+.espera-card {
+    -fx-background-color: rgba(11, 20, 43, 0.94);
+    -fx-background-radius: 16;
+    -fx-border-color: #f97316;
+    -fx-border-width: 2.5;
+    -fx-border-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(249, 115, 22, 0.35), 22, 0.25, 0, 0);
+}
+
+.espera-titulo {
+    -fx-text-fill: #facc15;
+    -fx-effect: dropshadow(gaussian, rgba(249, 115, 22, 0.5), 10, 0.3, 0, 2);
+}
+
+.espera-sala {
+    -fx-text-fill: #93c5fd;
+}
+
+.espera-info {
+    -fx-text-fill: #f8fafc;
+}
+
+.espera-indicador {
+    -fx-progress-color: #f97316;
+}
+
+.btn-cancelar {
+    -fx-background-color: #1d4ed8;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #93c5fd;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-padding: 10 18 10 18;
+    -fx-cursor: hand;
+}
+
+.btn-cancelar:hover {
+    -fx-background-color: #2563eb;
+    -fx-border-color: #facc15;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 18 10 18;
+}
+
+.btn-cancelar:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
+}
