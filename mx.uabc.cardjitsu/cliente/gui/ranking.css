@@ -1,0 +1,101 @@
+.ranking-root {
+    -fx-background-color: linear-gradient(to bottom right, #081229, #102554, #1b1438);
+}
+
+.ranking-lista {
+    -fx-background-color: rgba(11, 20, 43, 0.92);
+    -fx-background-radius: 12;
+    -fx-border-color: #f97316;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-padding: 10 14 10 14;
+    -fx-pref-height: 58px;
+    -fx-max-height: 58px;
+}
+
+.ranking-lista .label {
+    -fx-text-fill: #facc15;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(249, 115, 22, 0.45), 8, 0.25, 0, 1);
+}
+
+.ranking-lista .button {
+    -fx-background-color: linear-gradient(to right, #ea580c, #f97316);
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #fde047;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-padding: 7 14 7 14;
+    -fx-cursor: hand;
+}
+
+.ranking-lista .button:hover {
+    -fx-background-color: linear-gradient(to right, #f97316, #eab308);
+    -fx-text-fill: #0f172a;
+    -fx-border-color: #fde047;
+    -fx-border-width: 1.5;
+    -fx-padding: 7 14 7 14;
+}
+
+.ranking-panel {
+    -fx-background-color: rgba(11, 20, 43, 0.94);
+    -fx-background-radius: 14;
+    -fx-border-color: #f97316;
+    -fx-border-width: 2;
+    -fx-border-radius: 14;
+    -fx-padding: 16;
+}
+
+.ranking-titulo {
+    -fx-text-fill: #facc15;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.ranking-subtitulo {
+    -fx-text-fill: #93c5fd;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.ranking-tabla {
+    -fx-background-color: #071022;
+    -fx-control-inner-background: #071022;
+    -fx-background-radius: 10;
+    -fx-border-color: #2563eb;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 10;
+}
+
+.ranking-tabla .column-header-background {
+    -fx-background-color: #13254b;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.ranking-tabla .column-header .label {
+    -fx-text-fill: #facc15;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.ranking-tabla .table-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #f8fafc;
+    -fx-font-size: 12px;
+    -fx-padding: 7 8 7 8;
+}
+
+.ranking-tabla .table-row-cell:selected {
+    -fx-background-color: rgba(249, 115, 22, 0.35);
+    -fx-text-fill: #fde047;
+}
+
+.ranking-estado {
+    -fx-text-fill: #fde68a;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
