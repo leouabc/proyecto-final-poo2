@@ -1,5 +1,6 @@
 package cliente.red;
 
+import cliente.gui.GameUI.LobbyController;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,7 +8,6 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,12 +19,12 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import modelo.JavaBeans;
-import protocolo.MensajeProtocolo;
-import protocolo.TipoAccion;
 
 public class ClienteSocket {
+
     @FXML
     private TextField txtNombre;
+
     @FXML
     private PasswordField txtContra;
 
@@ -37,57 +37,29 @@ public class ClienteSocket {
     private static boolean escuchando = false;
 
     private static final Map<String, String> usuariosRegistrado = new HashMap<>();
-    @FXML 
+
+    @FXML
     public void initialize() {
-        
-    }
-    private void conectarServidor() {
+        if (cliente == null) {
+
+        }
         try {
-            conectarServidor();
-        } catch (Exception e) {
-            System.out.println("No se pudo conectar con el servidor.");
+            cliente = new Socket("localhost", 35557);
+            salida = new ObjectOutputStream(cliente.getOutputStream());
+            entrada = new ObjectInputStream(cliente.getInputStream());
+
+        } catch (IOException e){
             e.printStackTrace();
         }
     }
-    private void iniciarHiloEscucha() {
-        if (escuchando) return;
-        escuchando = true;
 
-        Thread hiloEscucha = new Thread(() -> {
-            try {
-                while (cliente != null && !cliente.isClosed()) {
-                    MensajeProtocolo respuesta = (MensajeProtocolo) entrada.readObject();
-                    procesarMensajeServidor(respuesta);
-                }
-            } catch (Exception e) {
-                escuchando = false;
-                System.out.println("Conexión perdida con el servidor.");
-            }
-        });
-        hiloEscucha.setDaemon(true);
-        hiloEscucha.start();
-    }
-    private void procesarMensajeServidor(MensajeProtocolo mensaje) {
-        Platform.runLater(() -> {
-            switch (mensaje.getTipo()) {
-                case REGISTRO:
-                    mostrarAlerta(Alert.AlertType.INFORMATION, "Registro", "Solicitud de registro exitosa!");
-                    break;
-                case LOGIN:
-                    cambiarPantalla(, "/cliente/gui/lobby.fxml");
-                    break;
-                default:
-                    break;
-            }
-        });
-    }
     @FXML 
-    public void onClickRegistrarse(ActionEvent event) {
+    public void onClickRegistrarse(ActionEvent e) {
         usuario = txtNombre.getText().trim();
         String password = txtContra.getText().trim();
-        
+
         if (usuario.isEmpty() || password.isEmpty()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Campso Vacios", "Algunos campos estan vacios");
+            mostrarAlerta(Alert.AlertType.WARNING, "Campos Vacios", "Algunos campos estan vacios");
             return;
         }
         try {
@@ -103,31 +75,22 @@ public class ClienteSocket {
             e.printStackTrace();
         }
     }
-    @FXML 
+
+    @FXML
     public void onClickEntrarTorneo(ActionEvent e) {
     usuario = txtNombre.getText().trim();
     String password = txtContra.getText().trim();
 
-    if (usuario.isEmpty() || password.isEmpty()) {
-        mostrarAlerta(Alert.AlertType.WARNING, "Campos Vacíos", "Algunos campos están vacíos");
-        return;
+        if (usuariosRegistrado.containsKey(usuario) && usuariosRegistrado.get(usuario).equals(password)) {
+            cambiarPantalla(e, "/cliente/gui/lobby.fxml");
+        } else {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error al iniciar el juego", "Intentalo de nuevo, un error a ocurrido.");
+        }
     }
-    try {
-        jugador = new JavaBeans();
-        jugador.setNombre(usuario);
-        jugador.setContra(password);
-
-        MensajeProtocolo msg = new MensajeProtocolo(TipoAccion.LOGIN, jugador);
-        salida.writeObject(msg);
-        salida.flush();
-    } catch (IOException ex) {
-        ex.printStackTrace();
-    }
-}
-    private void cambiarPantalla(String rutaFxml) {
+    private void cambiarPantalla(ActionEvent event, String rutaFxml) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(rutaFxml));
-            Stage stage = (Stage) txtNombre.getScene().getWindow();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
@@ -144,4 +107,3 @@ public class ClienteSocket {
         alerta.showAndWait();
     }
 }
-
