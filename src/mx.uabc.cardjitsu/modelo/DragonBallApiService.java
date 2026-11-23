@@ -155,8 +155,12 @@ public final class DragonBallApiService {
         if (!(imagen.startsWith("https://") || imagen.startsWith("http://"))) return null;
         BigDecimal valor = convertirEscala(ki);
         if (valor == null) return null;
+
+        // Convierte el .webp de la API a .png al vuelo para que JavaFX pueda dibujarlo
+        String imagenCompatible = "https://wsrv.nl/?url=" + imagen.trim() + "&output=png";
+
         return InspectorReglasUtil.crearCartaDesdeApi(
-                nombre.trim(), raza.trim(), imagen.trim(), ki.trim(), valor);
+                nombre.trim(), raza.trim(), imagenCompatible, ki.trim(), valor);
     }
 
     private static String campo(String json, String clave) {
