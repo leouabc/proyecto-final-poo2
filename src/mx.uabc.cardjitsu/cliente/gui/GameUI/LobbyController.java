@@ -1,4 +1,4 @@
-package cliente.gui;
+package cliente.gui.GameUI;
 
 import cliente.red.ClienteSocket;
 import cliente.red.ManejadorEventosCliente;
