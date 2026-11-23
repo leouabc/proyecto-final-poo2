@@ -1,5 +1,20 @@
 package protocolo;
 
-public class TipoAccion {
-    
+public enum TipoAccion {
+    REGISTRO,
+    LOGIN,
+    RANKING,
+    VOLVER_LOBBY,
+    CREAR_SALA,
+    UNIRSE_SALA,
+    BUSCAR_PARTIDA,
+    CANCELAR_ESPERA,
+    INICIAR_PARTIDA,
+    JUGAR_CARTA,
+    RESULTADO_RONDA,
+    FIN_PARTIDA,
+    PEDIR_REVANCHA,
+    REVANCHA_INICIADA,
+    SALIR_PARTIDA,
+    DESCONECTAR
 }
