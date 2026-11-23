@@ -1,7 +1,6 @@
 package servidor.red;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -39,7 +38,6 @@ public class ServidorSocket extends Application{
         public void run() {
             try {
                 salida = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
                 clientes.add(salida);
 
@@ -82,6 +80,6 @@ public class ServidorSocket extends Application{
     }
     @FXML 
     public void initialize() {
-
+        
     }
 }
