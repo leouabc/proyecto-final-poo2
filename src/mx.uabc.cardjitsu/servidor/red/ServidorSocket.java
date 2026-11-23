@@ -1,6 +1,7 @@
 package servidor.red;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,11 +15,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
+import protocolo.MensajeProtocolo;
 
 public class ServidorSocket extends Application{
     @FXML
     private TextArea areaServidor;
     
+    private String ipCliente;
 
     private static final int PUERTO = 35557;
     private static List<ObjectOutputStream> clientes = new ArrayList<>();
@@ -26,7 +29,7 @@ public class ServidorSocket extends Application{
     public static void main(String[] args) {
         launch(args);
     }
-    private static class ManejadorCliente implements Runnable {
+    private class ManejadorCliente implements Runnable {
         private Socket socket;
         private ObjectOutputStream salida;
 
@@ -38,11 +41,20 @@ public class ServidorSocket extends Application{
         public void run() {
             try {
                 salida = new ObjectOutputStream(socket.getOutputStream());
-
+                ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
                 clientes.add(salida);
 
+                while (true) {
+                    MensajeProtocolo msg = (MensajeProtocolo) entrada.readObject();
+                    System.out.println(msg);
+                    for (ObjectOutputStream salidaClientes : clientes) {
+                        salidaClientes.writeObject(msg);
+                        salidaClientes.flush();
+                    }
+                }
             } catch (Exception e) {
                 System.out.println("Un cliente se desconecto");
+                Platform.runLater(() -> areaServidor.appendText("El cliente" + ipCliente + " se desconecto!\n"));
                 clientes.remove(salida);
             }
         }
@@ -70,8 +82,9 @@ public class ServidorSocket extends Application{
             
             while (true) {
                 Socket cliente = server.accept();
+                ipCliente = cliente.getInetAddress().getHostAddress();
                 System.out.println("Cliente conectado");
-                Platform.runLater(() -> areaServidor.appendText("Cliente conectado \n"));
+                Platform.runLater(() -> areaServidor.appendText("Cliente " + ipCliente + " conectado \n"));
                 new Thread(new ManejadorCliente(cliente)).start();
             }
         } catch (IOException e) {
