@@ -34,7 +34,7 @@ public class EsperaController {
 
     @FXML
     private void initialize() {
-        ManejadorEventosCliente.setEsperaController(this);
+        ManejadorEventosCliente.registrarEspera(this);
     }
 
     public void setClienteSocket(ClienteSocket clienteSocket) {
@@ -49,26 +49,43 @@ public class EsperaController {
         this.nombreSala = nombreSala;
         this.codigoSala = codigoSala;
         Platform.runLater(() -> {
-            lblNombreDeSala.setText("Nombre de sala: " + nombreSala);
-            lblCodigoSala.setText("Código de sala: " + codigoSala);
-            btnCancelar.setDisable(false);
+            if (lblNombreDeSala != null) {
+                lblNombreDeSala.setText("Nombre de sala: " + nombreSala);
+            }
+            if (lblCodigoSala != null) {
+                lblCodigoSala.setText("Código de sala: " + codigoSala);
+            }
+            if (btnCancelar != null) {
+                btnCancelar.setDisable(false);
+            }
         });
+    }
+
+    private ClienteSocket asegurarConexion() {
+        if (clienteSocket == null) {
+            clienteSocket = new ClienteSocket();
+            clienteSocket.initialize();
+        }
+        return clienteSocket;
     }
 
     @FXML
     private void onClickBotonCancelar(ActionEvent event) {
-        btnCancelar.setDisable(true);
-        if (clienteSocket != null) {
-            MensajeProtocolo mensaje = new MensajeProtocolo();
-            mensaje.setTipo(TipoAccion.SALIR_SALA);
-            mensaje.setDato(codigoSala);
-            clienteSocket.enviar(mensaje);
+        if (btnCancelar != null) {
+            btnCancelar.setDisable(true);
         }
+        ClienteSocket socket = asegurarConexion();
+        MensajeProtocolo mensaje = new MensajeProtocolo();
+        mensaje.setTipo(TipoAccion.SALIR_PARTIDA);
+        mensaje.setMensaje(codigoSala);
+        socket.enviar(mensaje);
     }
 
     public void onPartidaLista(int rondaInicial, String nombreRival, int puntosIniciales) {
         Platform.runLater(() -> {
-            btnCancelar.setDisable(true);
+            if (btnCancelar != null) {
+                btnCancelar.setDisable(true);
+            }
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("partida.fxml"));
                 Parent root = loader.load();
@@ -79,7 +96,9 @@ public class EsperaController {
                 Stage stage = (Stage) btnCancelar.getScene().getWindow();
                 stage.setScene(new Scene(root));
             } catch (IOException e) {
-                btnCancelar.setDisable(false);
+                if (btnCancelar != null) {
+                    btnCancelar.setDisable(false);
+                }
             }
         });
     }
@@ -97,7 +116,9 @@ public class EsperaController {
                 Stage stage = (Stage) btnCancelar.getScene().getWindow();
                 stage.setScene(new Scene(root));
             } catch (IOException e) {
-                btnCancelar.setDisable(false);
+                if (btnCancelar != null) {
+                    btnCancelar.setDisable(false);
+                }
             }
         });
     }
