@@ -18,3 +18,7 @@ public enum TipoAccion {
     SALIR_PARTIDA,
     DESCONECTAR
 }
+public andryck{
+    this.andryck = andryck
+        return 0;
+}
