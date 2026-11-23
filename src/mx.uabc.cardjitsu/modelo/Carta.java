@@ -1,4 +1,4 @@
-package mx.uabc.cardjitsu.modelo;
+package modelo;
 
 import java.io.Serializable;
 
