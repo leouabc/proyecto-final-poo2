@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,6 +19,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import modelo.JavaBeans;
+import protocolo.MensajeProtocolo;
+import protocolo.TipoAccion;
 
 public class ClienteSocket {
     @FXML
@@ -31,24 +34,55 @@ public class ClienteSocket {
     private static Socket cliente;
     private static ObjectInputStream entrada;
     private static ObjectOutputStream salida;
+    private static boolean escuchando = false;
+
     private static final Map<String, String> usuariosRegistrado = new HashMap<>();
     @FXML 
     public void initialize() {
-        if (cliente == null) {
-
-        }
+        
+    }
+    private void conectarServidor() {
         try {
-            cliente = new Socket("localhost", 35557);
-            salida = new ObjectOutputStream(cliente.getOutputStream());
-            entrada = new ObjectInputStream(cliente.getInputStream());
-
-        } catch (IOException e){
+            conectarServidor();
+        } catch (Exception e) {
+            System.out.println("No se pudo conectar con el servidor.");
             e.printStackTrace();
         }
     }
+    private void iniciarHiloEscucha() {
+        if (escuchando) return;
+        escuchando = true;
 
+        Thread hiloEscucha = new Thread(() -> {
+            try {
+                while (cliente != null && !cliente.isClosed()) {
+                    MensajeProtocolo respuesta = (MensajeProtocolo) entrada.readObject();
+                    procesarMensajeServidor(respuesta);
+                }
+            } catch (Exception e) {
+                escuchando = false;
+                System.out.println("Conexión perdida con el servidor.");
+            }
+        });
+        hiloEscucha.setDaemon(true);
+        hiloEscucha.start();
+    }
+    private void procesarMensajeServidor(MensajeProtocolo mensaje) {
+        Platform.runLater(() -> {
+            switch (mensaje.getTipo()) {
+                case REGISTRO:
+                    mostrarAlerta(Alert.AlertType.INFORMATION, "Registro", "Solicitud de registro exitosa!");
+                    break;
+                case LOGIN:
+                    cambiarPantalla(, "/cliente/gui/lobby.fxml");
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
     @FXML 
-    public void onClickRegistrarse(ActionEvent e) {
+    public void onClickRegistrarse(ActionEvent event) {
         usuario = txtNombre.getText().trim();
         String password = txtContra.getText().trim();
         
@@ -56,32 +90,44 @@ public class ClienteSocket {
             mostrarAlerta(Alert.AlertType.WARNING, "Campso Vacios", "Algunos campos estan vacios");
             return;
         }
-        if (usuariosRegistrado.containsKey(usuario)) {
-            mostrarAlerta(Alert.AlertType.ERROR, "El usuario ya existe!", "El usuario que ingresaste, ya existe");
-        } else {
-            usuariosRegistrado.put(usuario, password);
-            jugador.setContra(password);
+        try {
+            jugador = new JavaBeans();
             jugador.setNombre(usuario);
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Registro exitoso", "Tu cuenta se creo!\n Bienvenid@ a Dragon Ball Jujitsu");
-            txtContra.clear();
-            txtNombre.clear();
+            jugador.setContra(password);
+
+            // Solo envías la petición al servidor (sin cambiar de pantalla aquí)
+            MensajeProtocolo msg = new MensajeProtocolo(TipoAccion.REGISTRO, jugador);
+            salida.writeObject(msg);
+            salida.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     @FXML 
     public void onClickEntrarTorneo(ActionEvent e) {
-        usuario = txtNombre.getText().trim();
-        String password = txtContra.getText().trim();
+    usuario = txtNombre.getText().trim();
+    String password = txtContra.getText().trim();
 
-        if (usuariosRegistrado.containsKey(usuario) && usuariosRegistrado.get(usuario).equals(password)) {
-            cambiarPantalla(e, "/cliente/gui/lobby.fxml");
-        } else {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error al iniciar el juego", "Intentalo de nuevo, un error a ocurrido.");
-        }
+    if (usuario.isEmpty() || password.isEmpty()) {
+        mostrarAlerta(Alert.AlertType.WARNING, "Campos Vacíos", "Algunos campos están vacíos");
+        return;
     }
-    private void cambiarPantalla(ActionEvent event, String rutaFxml) {
+    try {
+        jugador = new JavaBeans();
+        jugador.setNombre(usuario);
+        jugador.setContra(password);
+
+        MensajeProtocolo msg = new MensajeProtocolo(TipoAccion.LOGIN, jugador);
+        salida.writeObject(msg);
+        salida.flush();
+    } catch (IOException ex) {
+        ex.printStackTrace();
+    }
+}
+    private void cambiarPantalla(String rutaFxml) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(rutaFxml));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Stage stage = (Stage) txtNombre.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {

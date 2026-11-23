@@ -26,6 +26,9 @@ public class MensajeProtocolo implements Serializable {
     public MensajeProtocolo(TipoAccion tipo) {
         this.tipo = tipo;
     }
+    public MensajeProtocolo(TipoAccion tipo, JavaBeans bean) {
+        this.tipo = tipo;
+    }
 
     public TipoAccion getTipo() {
         return tipo;

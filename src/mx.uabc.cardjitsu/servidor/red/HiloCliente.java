@@ -22,9 +22,8 @@ public class HiloCliente implements Runnable {
     private String ipCliente;
     private volatile boolean conectado;
 
-    public HiloCliente(Socket socket, TextArea areaServidor) {
+    public HiloCliente(Socket socket) {
         this.socket = socket;
-        this.areaServidor = areaServidor;
         this.ipCliente = socket.getInetAddress().getHostAddress();
         this.repositorio = new RepositorioJugadores();
         this.conectado = true;
