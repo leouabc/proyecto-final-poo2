@@ -49,38 +49,67 @@ public class HiloCliente implements Runnable {
     }
 
     private void procesarMensaje(MensajeProtocolo mensaje) {
-        TipoAccion accion = mensaje.getAccion();
+        TipoAccion tipo = mensaje.getTipo();
 
-        if (accion == TipoAccion.REGISTRO) {
-            JavaBeans datos = (JavaBeans) mensaje.getDatos();
-            boolean registrado = repositorio.registrarJugador(datos.getNombre(), datos.getContra());
-            enviar(new MensajeProtocolo(TipoAccion.REGISTRO, registrado));
-            registrarLog("Registro de " + datos.getNombre() + ": " + (registrado ? "OK" : "Ya existe"));
+        if (tipo == TipoAccion.REGISTRO) {
+            String nombre = mensaje.getNombreUsuario();
+            String contra = mensaje.getContrasena();
+            boolean registrado = repositorio.registrarJugador(nombre, contra);
+            JavaBeans jugador = registrado ? repositorio.buscarPorNombre(nombre) : null;
 
-        } else if (accion == TipoAccion.LOGIN) {
-            JavaBeans datos = (JavaBeans) mensaje.getDatos();
-            JavaBeans jugador = repositorio.iniciarSesion(datos.getNombre(), datos.getContra());
-            if (jugador != null) {
+            MensajeProtocolo respuesta = new MensajeProtocolo();
+            respuesta.setTipo(TipoAccion.REGISTRO);
+            respuesta.setExito(registrado);
+            respuesta.setMensaje(registrado ? "Registro exitoso" : "El guerrero ya existe");
+            respuesta.setJugador(jugador);
+            if (registrado) {
+                this.jugadorActual = jugador;
+            }
+            enviar(respuesta);
+            registrarLog("Registro de " + nombre + ": " + (registrado ? "OK" : "Ya existe"));
+
+        } else if (tipo == TipoAccion.LOGIN) {
+            String nombre = mensaje.getNombreUsuario();
+            String contra = mensaje.getContrasena();
+            JavaBeans jugador = repositorio.iniciarSesion(nombre, contra);
+            boolean exito = (jugador != null);
+
+            MensajeProtocolo respuesta = new MensajeProtocolo();
+            respuesta.setTipo(TipoAccion.LOGIN);
+            respuesta.setExito(exito);
+            respuesta.setMensaje(exito ? "Bienvenido al torneo" : "Usuario o contraseña incorrectos");
+            respuesta.setJugador(jugador);
+            if (exito) {
                 this.jugadorActual = jugador;
                 registrarLog("Guerrero conectado: " + jugador.getNombre());
             }
-            enviar(new MensajeProtocolo(TipoAccion.LOGIN, jugador));
+            enviar(respuesta);
 
-        } else if (accion == TipoAccion.RANKING) {
-            enviar(new MensajeProtocolo(TipoAccion.RANKING, repositorio.obtenerRanking()));
+        } else if (tipo == TipoAccion.RANKING) {
+            MensajeProtocolo respuesta = new MensajeProtocolo();
+            respuesta.setTipo(TipoAccion.RANKING);
+            respuesta.setRanking(repositorio.obtenerRanking());
+            enviar(respuesta);
 
-        } else if (accion == TipoAccion.BUSCAR_PARTIDA) {
+        } else if (tipo == TipoAccion.CREAR_SALA || tipo == TipoAccion.UNIRSE_SALA || tipo == TipoAccion.BUSCAR_PARTIDA) {
             SalaJuego.emparejarJugador(this);
-            registrarLog((jugadorActual != null ? jugadorActual.getNombre() : ipCliente) + " buscando partida...");
+            registrarLog((jugadorActual != null ? jugadorActual.getNombre() : ipCliente) + " buscando combate...");
 
-        } else if (accion == TipoAccion.JUGAR_CARTA) {
+        } else if (tipo == TipoAccion.JUGAR_CARTA) {
             if (salaActual != null) {
-                String carta = (String) mensaje.getDatos();
-                salaActual.registrarJugada(this, carta);
+                salaActual.registrarJugada(this, mensaje.getIndiceCarta());
             }
 
-        } else if (accion == TipoAccion.DESCONECTAR) {
-            desconectar();
+        } else if (tipo == TipoAccion.PEDIR_REVANCHA) {
+            if (salaActual != null) {
+                salaActual.solicitarRevancha(this);
+            }
+
+        } else if (tipo == TipoAccion.SALIR_PARTIDA || tipo == TipoAccion.CANCELAR_ESPERA) {
+            SalaJuego.removerDeCola(this);
+            if (salaActual != null) {
+                salaActual.notificarAbandono(this);
+            }
         }
     }
 
