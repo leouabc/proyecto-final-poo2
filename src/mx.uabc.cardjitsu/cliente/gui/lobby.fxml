@@ -4,14 +4,15 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="lobby-root" stylesheets="@lobby.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente.gui.GameUI.LobbyController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="560.0" minWidth="760.0" prefHeight="620.0" prefWidth="860.0" styleClass="lobby-root" stylesheets="@lobby.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente.gui.GameUI.LobbyController">
    <top>
-      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="12.0" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_LEFT" prefHeight="72.0" prefWidth="200.0" spacing="12.0" BorderPane.alignment="CENTER">
          <padding>
             <Insets bottom="15.0" />
          </padding>
@@ -19,26 +20,36 @@
             <Label fx:id="lblGuerrero" styleClass="lobby-texto" text="Guerrero: ---" />
             <Label fx:id="lblRango" styleClass="lobby-rango" text="Rango: ---" />
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Button fx:id="btnRanking" mnemonicParsing="false" onAction="#onClickRanking" styleClass="btn-ranking" text="RAKING" />
+            <HBox alignment="CENTER_RIGHT" spacing="8">
+               <children>
+                  <Button fx:id="btnHistorial" mnemonicParsing="false" onAction="#onClickHistorial" text="HISTORIAL" />
+                  <Button fx:id="btnRanking" mnemonicParsing="false" onAction="#onClickRanking" styleClass="btn-ranking" text="RANKING" />
+               </children>
+            </HBox>
          </children>
       </HBox>
    </top>
    <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" styleClass="lobby-panel" BorderPane.alignment="CENTER">
+      <VBox prefHeight="360.0" prefWidth="100.0" spacing="14.0" styleClass="lobby-panel" BorderPane.alignment="CENTER">
          <children>
             <Label styleClass="lobby-titulo-seccion" text="SALAS DISPONIBLES" />
+            <HBox spacing="8.0">
+               <TextField fx:id="txtCodigoSala" promptText="Código de sala (opcional)" HBox.hgrow="ALWAYS" />
+               <Button mnemonicParsing="false" onAction="#onClickActualizarSalas" text="ACTUALIZAR" />
+            </HBox>
             <ListView fx:id="LvSalas" prefHeight="200.0" prefWidth="200.0" styleClass="lobby-lista" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
    </center>
    <bottom>
-      <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="130.0" prefWidth="100.0" spacing="10.0" BorderPane.alignment="CENTER">
          <padding>
             <Insets top="15.0" />
          </padding>
          <children>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="16.0">
                <children>
+                  <Button mnemonicParsing="false" onAction="#onClickPartidaRapida" text="PARTIDA RÁPIDA" />
                   <Button fx:id="btnCrearSalas" mnemonicParsing="false" onAction="#onClickCrear" styleClass="btn-crear" text="CREAR SALA" />
                   <Button fx:id="btnUnirse" mnemonicParsing="false" onAction="#onClickUnirse" styleClass="btn-unirse" text="UNIRSE A SALA" />
                </children>

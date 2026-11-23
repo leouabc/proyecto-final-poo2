@@ -12,9 +12,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import modelo.JavaBeans;
 import protocolo.MensajeProtocolo;
@@ -32,6 +34,9 @@ public class LobbyController {
     private Button btnRanking;
 
     @FXML
+    private Button btnHistorial;
+
+    @FXML
     private ListView<String> LvSalas;
 
     @FXML
@@ -42,6 +47,8 @@ public class LobbyController {
 
     @FXML
     private Label lblEstadodeSala;
+
+    @FXML private TextField txtCodigoSala;
 
     private ClienteSocket clienteSocket;
     private JavaBeans jugadorActual;
@@ -60,6 +67,13 @@ public class LobbyController {
 
     public void setClienteSocket(ClienteSocket clienteSocket) {
         this.clienteSocket = clienteSocket;
+        solicitarSalas();
+    }
+
+    private void solicitarSalas() {
+        if (clienteSocket == null) return;
+        MensajeProtocolo mensaje = new MensajeProtocolo(TipoAccion.LISTAR_SALAS);
+        clienteSocket.enviar(mensaje);
     }
 
     public void setJugadorActual(JavaBeans jugadorActual) {
@@ -96,7 +110,7 @@ public class LobbyController {
     public void onSalaCreadaOUnida(String nombreSala, String codigoSala) {
         Platform.runLater(() -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("espera.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/cliente/gui/espera.fxml"));
                 Parent root = loader.load();
                 EsperaController esperaController = loader.getController();
                 esperaController.setClienteSocket(clienteSocket);
@@ -113,24 +127,34 @@ public class LobbyController {
         });
     }
 
-    public void onRankingCargado(List<JavaBeans> jugadoresOrdenados) {
+
+    /** Abre la pantalla de espera para una búsqueda rápida o una revancha. */
+    public void onBusquedaPartida(String estado) {
         Platform.runLater(() -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("ranking.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/cliente/gui/espera.fxml"));
                 Parent root = loader.load();
-                RankingController rankingController = loader.getController();
-                rankingController.setClienteSocket(clienteSocket);
-                rankingController.setJugadorActual(jugadorActual);
-                rankingController.actualizarRanking(jugadoresOrdenados);
-                Stage stage = (Stage) btnRanking.getScene().getWindow();
-                stage.setScene(new Scene(root));
-            } catch (IOException e) {
-                bloquearControles(false);
-                if (lblEstadodeSala != null) {
-                    lblEstadodeSala.setText("Error al abrir el ranking.");
-                }
+                EsperaController esperaController = loader.getController();
+                esperaController.setClienteSocket(clienteSocket);
+                esperaController.setJugadorActual(jugadorActual);
+                esperaController.setDatosSala("Emparejamiento rápido", "Automático");
+                esperaController.mostrarEstado(estado == null ? "Buscando rival..." : estado);
+                Stage stage = obtenerStage();
+                if (stage != null) stage.setScene(new Scene(root));
+            } catch (IOException ex) {
+                mostrarEstado("No se pudo abrir la búsqueda: " + ex.getMessage());
             }
         });
+    }
+
+    private Stage obtenerStage() {
+        if (btnRanking != null && btnRanking.getScene() != null) {
+            return (Stage) btnRanking.getScene().getWindow();
+        }
+        if (btnCrearSalas != null && btnCrearSalas.getScene() != null) {
+            return (Stage) btnCrearSalas.getScene().getWindow();
+        }
+        return null;
     }
 
     private ClienteSocket asegurarConexion() {
@@ -157,8 +181,9 @@ public class LobbyController {
     @FXML
     private void onClickUnirse(ActionEvent event) {
         String salaSeleccionada = (LvSalas != null) ? LvSalas.getSelectionModel().getSelectedItem() : null;
-        if (salaSeleccionada == null || salaSeleccionada.isBlank()) {
-            mostrarEstado("Selecciona una sala de la lista.");
+        String codigo = txtCodigoSala != null ? txtCodigoSala.getText().trim() : "";
+        if (codigo.isEmpty() && (salaSeleccionada == null || salaSeleccionada.isBlank())) {
+            mostrarEstado("Escribe un código o selecciona una sala.");
             return;
         }
 
@@ -168,23 +193,102 @@ public class LobbyController {
             lblEstadodeSala.setText("Uniéndose a: " + salaSeleccionada);
         }
 
+        if (codigo.isEmpty() && salaSeleccionada != null) {
+            codigo = salaSeleccionada.substring(salaSeleccionada.lastIndexOf("Código:") + 7).trim();
+        }
         MensajeProtocolo mensaje = new MensajeProtocolo();
         mensaje.setTipo(TipoAccion.UNIRSE_SALA);
-        mensaje.setMensaje(salaSeleccionada);
+        mensaje.setSalaCodigo(codigo);
         socket.enviar(mensaje);
+    }
+
+    @FXML
+    private void onClickPartidaRapida(ActionEvent event) {
+        ClienteSocket socket = asegurarConexion();
+        bloquearControles(true);
+        if (lblEstadodeSala != null) lblEstadodeSala.setText("Buscando un rival...");
+        socket.enviar(new MensajeProtocolo(TipoAccion.BUSCAR_PARTIDA));
+    }
+
+    @FXML
+    private void onClickActualizarSalas(ActionEvent event) {
+        solicitarSalas();
+        mostrarEstado("Actualizando salas disponibles...");
+    }
+
+    @FXML
+    private void onClickHistorial(ActionEvent event) {
+        ClienteSocket socket = asegurarConexion();
+        Node origen = event != null && event.getSource() instanceof Node
+                ? (Node) event.getSource() : btnHistorial;
+        Stage stage = origen != null && origen.getScene() != null
+                ? (Stage) origen.getScene().getWindow() : obtenerStage();
+        if (stage == null) {
+            mostrarEstado("No se encontró la ventana para abrir el historial.");
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/cliente/gui/historial.fxml"));
+            Parent root = loader.load();
+            HistorialController controller = loader.getController();
+            controller.setClienteSocket(socket);
+            controller.setJugadorActual(jugadorActual);
+            stage.setScene(new Scene(root));
+            stage.setTitle("Dragon Ball Card-Jitsu - Historial");
+            controller.activar();
+            controller.solicitarHistorial();
+        } catch (Exception ex) {
+            mostrarEstado("No se pudo abrir el historial: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
     @FXML
     private void onClickRanking(ActionEvent event) {
         ClienteSocket socket = asegurarConexion();
-        bloquearControles(true);
-        if (lblEstadodeSala != null) {
-            lblEstadodeSala.setText("Cargando ranking...");
+        Node origen = event != null && event.getSource() instanceof Node
+                ? (Node) event.getSource() : btnRanking;
+        Stage stage = origen != null && origen.getScene() != null
+                ? (Stage) origen.getScene().getWindow() : obtenerStage();
+
+        if (stage == null) {
+            mostrarEstado("No se encontró la ventana para abrir el ranking.");
+            return;
+        }
+        if (btnRanking != null) btnRanking.setDisable(true);
+
+        RankingController rankingController = null;
+        Parent root;
+        try {
+            java.net.URL recurso = getClass().getResource("/cliente/gui/ranking.fxml");
+            if (recurso == null) throw new IOException("No se encontró cliente/gui/ranking.fxml en los recursos.");
+            FXMLLoader loader = new FXMLLoader(recurso);
+            root = loader.load();
+            rankingController = loader.getController();
+            if (rankingController == null) throw new IOException("El FXML no creó RankingController.");
+            rankingController.setClienteSocket(socket);
+            rankingController.setJugadorActual(jugadorActual);
+        } catch (Exception errorFxml) {
+            // La navegación no debe quedar bloqueada por un error de FXML o de CSS.
+            rankingController = new RankingController();
+            rankingController.setClienteSocket(socket);
+            rankingController.setJugadorActual(jugadorActual);
+            root = rankingController.crearVistaRespaldo();
+            System.err.println("No se pudo cargar ranking.fxml; se abrió la vista de respaldo.");
+            errorFxml.printStackTrace();
         }
 
-        MensajeProtocolo mensaje = new MensajeProtocolo();
-        mensaje.setTipo(TipoAccion.RANKING);
-        socket.enviar(mensaje);
+        try {
+            stage.setScene(new Scene(root));
+            stage.setTitle("Dragon Ball Jujitsu - Ranking");
+            rankingController.activar();
+            rankingController.solicitarRanking();
+        } catch (Exception ex) {
+            ManejadorEventosCliente.registrarLobby(this);
+            if (btnRanking != null) btnRanking.setDisable(false);
+            mostrarEstado("No se pudo mostrar el ranking: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
     private void bloquearControles(boolean bloqueado) {
@@ -196,6 +300,9 @@ public class LobbyController {
         }
         if (btnRanking != null) {
             btnRanking.setDisable(bloqueado);
+        }
+        if (btnHistorial != null) {
+            btnHistorial.setDisable(bloqueado);
         }
         if (LvSalas != null) {
             LvSalas.setDisable(bloqueado);

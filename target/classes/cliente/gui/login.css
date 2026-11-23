@@ -1,0 +1,79 @@
+.login-root {
+    -fx-background-color: linear-gradient(to bottom right, #081229, #102554, #1b1438);
+}
+
+.login-card {
+    -fx-background-color: rgba(11, 20, 43, 0.94);
+    -fx-background-radius: 16;
+    -fx-border-color: #f97316;
+    -fx-border-width: 2.5;
+    -fx-border-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(250, 204, 21, 0.22), 24, 0.2, 0, 0);
+}
+
+.login-titulo {
+    -fx-text-fill: #facc15;
+    -fx-effect: dropshadow(gaussian, rgba(249, 115, 22, 0.55), 10, 0.3, 0, 2);
+}
+
+.login-subtitulo {
+    -fx-text-fill: #bae6fd;
+}
+
+.login-campo {
+    -fx-background-color: #071022;
+    -fx-text-fill: #f8fafc;
+    -fx-prompt-text-fill: #64748b;
+    -fx-background-radius: 8;
+    -fx-border-color: #2563eb;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-padding: 10 12 10 12;
+}
+
+.login-campo:focused {
+    -fx-border-color: #facc15;
+    -fx-border-width: 2;
+}
+
+.btn-registrar {
+    -fx-background-color: #1d4ed8;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #93c5fd;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.btn-registrar:hover {
+    -fx-background-color: #2563eb;
+    -fx-border-color: #facc15;
+    -fx-font-size: 19px;
+}
+
+.btn-entrar {
+    -fx-background-color: linear-gradient(to right, #ea580c, #f97316);
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #fde047;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+}
+
+.btn-entrar:hover {
+    -fx-background-color: linear-gradient(to right, #f97316, #eab308);
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 19px;
+}
+
+.btn-registrar:disabled,
+.btn-entrar:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
+}
+
+.login-info {
+    -fx-text-fill: #fde68a;
+}

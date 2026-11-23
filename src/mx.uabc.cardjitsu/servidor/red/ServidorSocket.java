@@ -1,13 +1,8 @@
 package servidor.red;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -15,84 +10,91 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
-import protocolo.MensajeProtocolo;
+import servidor.datos.ManejadorDB4O;
 
-public class ServidorSocket extends Application{
+/**
+ * Servidor principal. Cada conexión se atiende con su propio HiloCliente;
+ * los mensajes de cada jugador ya no se difunden indiscriminadamente a todos.
+ */
+public class ServidorSocket extends Application {
+    private static final int PUERTO = 35557;
+
     @FXML
     private TextArea areaServidor;
-    
-    private String ipCliente;
 
-    private static final int PUERTO = 35557;
-    private static List<ObjectOutputStream> clientes = new ArrayList<>();
+    private volatile boolean servidorActivo;
+    private volatile ServerSocket socketServidor;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-    private class ManejadorCliente implements Runnable {
-        private Socket socket;
-        private ObjectOutputStream salida;
-
-        public ManejadorCliente(Socket socket) {
-            this.socket = socket;
-        }
-
-        @Override
-        public void run() {
-            try {
-                salida = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
-                clientes.add(salida);
-
-                while (true) {
-                    MensajeProtocolo msg = (MensajeProtocolo) entrada.readObject();
-                    System.out.println(msg);
-                    for (ObjectOutputStream salidaClientes : clientes) {
-                        salidaClientes.writeObject(msg);
-                        salidaClientes.flush();
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("Un cliente se desconecto");
-                Platform.runLater(() -> areaServidor.appendText("El cliente" + ipCliente + " se desconecto!\n"));
-                clientes.remove(salida);
-            }
-        }
-    }
-    
-    @Override 
+    @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("gui-server.fxml"));
         loader.setController(this);
         Scene scene = new Scene(loader.load());
 
-        stage.setTitle("Servidor");
+        stage.setTitle("Servidor Dragon Ball Card-Jitsu");
         stage.setScene(scene);
         stage.show();
 
-        Thread hiloServidor = new Thread(() -> iniciarServidor());
+        servidorActivo = true;
+        Thread hiloServidor = new Thread(this::iniciarServidor, "servidor-socket");
         hiloServidor.setDaemon(true);
         hiloServidor.start();
+
+        stage.setOnCloseRequest(event -> detenerServidor());
     }
-    
+
     private void iniciarServidor() {
-        try (ServerSocket server = new ServerSocket(PUERTO)) {
-            System.out.println("El servidor esta iniciado");
-            Platform.runLater(() -> areaServidor.appendText("SERVIDOR INICIADO \n ----------- \n"));
-            
-            while (true) {
-                Socket cliente = server.accept();
-                ipCliente = cliente.getInetAddress().getHostAddress();
-                System.out.println("Cliente conectado");
-                Platform.runLater(() -> areaServidor.appendText("Cliente " + ipCliente + " conectado \n"));
-                new Thread(new ManejadorCliente(cliente)).start();
+        try (ServerSocket servidor = new ServerSocket(PUERTO)) {
+            socketServidor = servidor;
+            registrarLog("SERVIDOR INICIADO EN EL PUERTO " + PUERTO);
+
+            while (servidorActivo) {
+                Socket socket = servidor.accept();
+                String ip = socket.getInetAddress().getHostAddress();
+                registrarLog("Cliente conectado: " + ip);
+
+                Thread hiloCliente = new Thread(
+                        new HiloCliente(socket, areaServidor),
+                        "cliente-" + ip
+                );
+                hiloCliente.setDaemon(true);
+                hiloCliente.start();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            if (servidorActivo) registrarLog("Error del servidor: " + e.getMessage());
+        } finally {
+            socketServidor = null;
         }
     }
-    @FXML 
+
+    private void detenerServidor() {
+        servidorActivo = false;
+        ServerSocket servidor = socketServidor;
+        if (servidor != null && !servidor.isClosed()) {
+            try { servidor.close(); } catch (IOException ignored) { }
+        }
+        try { ManejadorDB4O.cerrarConexion(); }
+        catch (RuntimeException ex) { registrarLog("No se pudo cerrar DB4O: " + ex.getMessage()); }
+    }
+
+    @Override
+    public void stop() {
+        detenerServidor();
+    }
+
+    private void registrarLog(String texto) {
+        System.out.println(texto);
+        if (areaServidor != null) {
+            Platform.runLater(() -> areaServidor.appendText(texto + "\n"));
+        }
+    }
+
+    @FXML
     public void initialize() {
-        
+        // La interfaz no requiere inicialización adicional.
+    }
+
+    public static void main(String[] args) {
+        Application.launch(ServidorSocket.class, args);
     }
 }

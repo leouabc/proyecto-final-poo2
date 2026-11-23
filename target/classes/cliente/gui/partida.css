@@ -1,0 +1,202 @@
+.partida-root {
+    -fx-background-color: linear-gradient(to bottom right, #081229, #102554, #1b1438);
+}
+
+.partida-barra {
+    -fx-background-color: rgba(11, 20, 43, 0.94);
+    -fx-background-radius: 12;
+    -fx-background-insets: 0 0 12 0;
+    -fx-border-color: #f97316;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-border-insets: 0 0 12 0;
+    -fx-padding: 12 20 24 20;
+    -fx-pref-height: 64px;
+    -fx-max-height: 64px;
+}
+
+.partida-barra .label {
+    -fx-text-fill: #facc15;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.partida-zona-ganadas {
+    -fx-background-color: rgba(11, 20, 43, 0.92);
+    -fx-background-radius: 12;
+    -fx-border-color: #2563eb;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-padding: 14;
+}
+
+.partida-zona-ganadas > .label {
+    -fx-text-fill: #93c5fd;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.partida-arena {
+    -fx-background-color: rgba(7, 16, 34, 0.94);
+    -fx-background-radius: 16;
+    -fx-background-insets: 0 12 0 12;
+    -fx-border-color: #facc15;
+    -fx-border-width: 2;
+    -fx-border-radius: 16;
+    -fx-border-insets: 0 12 0 12;
+    -fx-padding: 10 24 10 24;
+}
+
+.partida-arena > .label {
+    -fx-text-fill: #fde047;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(249, 115, 22, 0.45), 8, 0.25, 0, 1);
+}
+
+.partida-arena .carta-slot {
+    -fx-min-width: 140px;
+    -fx-pref-width: 140px;
+    -fx-min-height: 190px;
+    -fx-pref-height: 195px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.partida-mano {
+    -fx-background-color: rgba(11, 20, 43, 0.94);
+    -fx-background-radius: 14;
+    -fx-background-insets: 12 0 0 0;
+    -fx-border-color: #f97316;
+    -fx-border-width: 2;
+    -fx-border-radius: 14;
+    -fx-border-insets: 12 0 0 0;
+    -fx-padding: 24 16 14 16;
+    -fx-pref-height: 300px;
+}
+
+.partida-mano > .label {
+    -fx-text-fill: #f8fafc;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.partida-mano .carta-slot {
+    -fx-min-width: 95px;
+    -fx-pref-width: 105px;
+    -fx-min-height: 188px;
+    -fx-pref-height: 190px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.carta-slot {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.carta-slot:hover {
+    -fx-background-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(250, 204, 21, 0.42), 12, 0.18, 0, 0);
+}
+
+.partida-arena .button {
+    -fx-background-color: #1d4ed8;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #93c5fd;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-padding: 9 16 9 16;
+    -fx-cursor: hand;
+}
+
+.partida-arena .button:hover {
+    -fx-background-color: #2563eb;
+    -fx-border-color: #facc15;
+    -fx-border-width: 1.5;
+    -fx-padding: 9 16 9 16;
+}
+
+.btn-confirmar {
+    -fx-background-color: linear-gradient(to right, #ea580c, #f97316);
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #fde047;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-padding: 9 24 9 24;
+    -fx-cursor: hand;
+}
+
+.btn-confirmar:hover {
+    -fx-background-color: linear-gradient(to right, #f97316, #eab308);
+    -fx-text-fill: #0f172a;
+    -fx-border-color: #fde047;
+    -fx-border-width: 1.5;
+    -fx-padding: 9 24 9 24;
+}
+
+.btn-confirmar:disabled,
+.partida-arena .button:disabled {
+    -fx-opacity: 0.55;
+    -fx-cursor: default;
+}
+
+.chat-titulo {
+    -fx-text-fill: #facc15;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.chat-historial {
+    -fx-font-size: 15px;
+    -fx-control-inner-background: #0b1730;
+    -fx-text-fill: #f8fafc;
+    -fx-highlight-fill: #2563eb;
+    -fx-highlight-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #315b9d;
+    -fx-border-radius: 10;
+}
+.chat-entrada {
+    -fx-font-size: 14px;
+    -fx-pref-height: 48px;
+    -fx-font-size: 15px;
+    -fx-background-radius: 9;
+    -fx-padding: 9 13;
+}
+.chat-enviar {
+    -fx-background-color: linear-gradient(to bottom, #f59e0b, #ea580c);
+    -fx-text-fill: #111827;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 9;
+    -fx-border-color: #fde68a;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 9;
+    -fx-padding: 12 18;
+    -fx-min-width: 108px;
+    -fx-cursor: hand;
+}
+.chat-enviar:hover { -fx-background-color: #facc15; }
+.chat-enviar:pressed { -fx-background-color: #c2410c; }
+
+.partida-personaje-titulo {
+    -fx-text-fill: #93c5fd;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.chat-enviar:disabled {
+    -fx-opacity: 0.55;
+}

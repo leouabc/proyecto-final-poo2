@@ -1,0 +1,22 @@
+CONFIGURACIÓN NECESARIA PARA MOSTRAR LOS RETRATOS DE DRAGON BALL API
+
+El campo image de la API puede devolver imágenes WebP. JavaFX ImageView no
+decodifica WebP de forma nativa en todas las versiones. Por eso las cartas usan
+javafx.scene.web.WebView, cuyo motor WebKit sí puede mostrar esos retratos.
+
+1. Usa un JavaFX SDK compatible con tu versión de JDK.
+2. Asegúrate de que el SDK incluya javafx.web.jar (además de controls, fxml y graphics).
+3. Al ejecutar la aplicación, agrega javafx.web a los módulos habilitados.
+
+Ejemplo de argumentos VM en Windows (ajusta la ruta a tu JavaFX SDK):
+
+--module-path "C:\javafx-sdk-21\lib" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.web
+
+En NetBeans, agrega el módulo javafx.web a la configuración JavaFX del proyecto
+o añade el SDK completo al module path. En VS Code, usa los mismos argumentos
+VM en la configuración de lanzamiento.
+
+Si después de esto el retrato sigue sin aparecer, revisa que la computadora del
+CLIENTE tenga acceso a Internet: el servidor entrega los datos y la URL image,
+pero WebView descarga la imagen desde el cliente. El texto de error ahora se
+muestra dentro de la carta si el servidor remoto rechaza la descarga.

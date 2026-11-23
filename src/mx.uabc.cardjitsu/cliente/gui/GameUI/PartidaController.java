@@ -13,9 +13,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.effect.DropShadow;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Locale;
 import javafx.stage.Stage;
 import modelo.Carta;
 import modelo.JavaBeans;
@@ -37,9 +45,6 @@ public class PartidaController {
     private TextArea txtAreaChat;
 
     @FXML
-    private VBox VboxCartasRival;
-
-    @FXML
     private TextField txtMensaje;
 
     @FXML
@@ -54,8 +59,6 @@ public class PartidaController {
     @FXML
     private VBox CartaTuyaLanzada;
 
-    @FXML
-    private VBox cartaEnemiga;
 
     @FXML
     private Button btnRegresar;
@@ -85,8 +88,11 @@ public class PartidaController {
     private JavaBeans jugadorActual;
     private List<Carta> manoActual = new ArrayList<>();
     private final List<VBox> slotsMano = new ArrayList<>();
+    /** Caché local de los marcos PNG; son capas decorativas, no retratos de personajes. */
+    private final Map<String, Image> cacheMarcosRaza = new HashMap<>();
     private int indiceSeleccionado = -1;
     private boolean jugadaConfirmada;
+    private boolean revanchaPorAbandonoDisponible;
 
     @FXML
     private void initialize() {
@@ -104,8 +110,10 @@ public class PartidaController {
             slot.setOnMouseClicked(event -> seleccionarCarta(indice));
         }
 
+        revanchaPorAbandonoDisponible = false;
         if (btnRevancha != null) {
             btnRevancha.setDisable(true);
+            btnRevancha.setText("REVANCHA: ESPERANDO ABANDONO");
         }
         if (btnConfirmar != null) {
             btnConfirmar.setDisable(true);
@@ -134,9 +142,8 @@ public class PartidaController {
             return;
         }
         String texto = txtMensaje.getText() != null ? txtMensaje.getText().trim() : "";
-        if (texto.isEmpty()) {
-            return;
-        }
+        if (texto.isEmpty()) return;
+        if (texto.length() > 300) texto = texto.substring(0, 300);
 
         String remitente = (jugadorActual != null && jugadorActual.getNombre() != null && !jugadorActual.getNombre().isBlank())
                 ? jugadorActual.getNombre()
@@ -194,7 +201,11 @@ public class PartidaController {
                 slot.getChildren().clear();
                 slot.setDisable(false);
                 if (i < manoActual.size()) {
-                    slot.getChildren().add(crearTarjetaVisual(manoActual.get(i)));
+                    VBox tarjeta = crearTarjetaVisual(manoActual.get(i));
+                    slot.setMinSize(tarjeta.getPrefWidth(), tarjeta.getPrefHeight());
+                    slot.setPrefSize(tarjeta.getPrefWidth(), tarjeta.getPrefHeight());
+                    slot.setMaxSize(tarjeta.getPrefWidth(), tarjeta.getPrefHeight());
+                    slot.getChildren().add(tarjeta);
                 }
             }
         });
@@ -247,16 +258,9 @@ public class PartidaController {
                     CartaTuyaLanzada.getChildren().add(crearTarjetaVisual(cartaPropia));
                 }
             }
-            if (cartaEnemiga != null) {
-                cartaEnemiga.getChildren().clear();
-                if (cartaRival != null) {
-                    cartaEnemiga.getChildren().add(crearTarjetaVisual(cartaRival));
-                }
-            }
-            if (ganoRonda && cartaRival != null && VboxTusCartasGanadas != null) {
+            boolean empate = resultadoTexto != null && resultadoTexto.toLowerCase().contains("empate");
+            if (!empate && ganoRonda && cartaRival != null && VboxTusCartasGanadas != null) {
                 VboxTusCartasGanadas.getChildren().add(crearTarjetaVisual(cartaRival));
-            } else if (!ganoRonda && cartaPropia != null && VboxCartasRival != null) {
-                VboxCartasRival.getChildren().add(crearTarjetaVisual(cartaPropia));
             }
             if (lblResultado != null) {
                 lblResultado.setText("Resultado: " + (resultadoTexto != null ? resultadoTexto : ""));
@@ -281,49 +285,53 @@ public class PartidaController {
                 lblResultado.setText("Resultado: " + resumenFinal);
             }
             if (btnRevancha != null) {
-                btnRevancha.setDisable(false);
+                btnRevancha.setDisable(true);
+                btnRevancha.setText("REVANCHA: ESPERANDO ABANDONO");
             }
         });
     }
 
-    public void reiniciarParaRevancha(int rondaInicial, String nombreRival, int puntosIniciales, List<Carta> cartasIniciales) {
+    /** Solo un evento RIVAL_ABANDONO del servidor permite volver a buscar combate. */
+    public void habilitarRevanchaPorAbandono(String mensaje) {
         Platform.runLater(() -> {
+            revanchaPorAbandonoDisponible = true;
             if (btnRevancha != null) {
-                btnRevancha.setDisable(true);
+                btnRevancha.setDisable(false);
+                btnRevancha.setText("BUSCAR NUEVO RIVAL");
             }
-            if (CartaTuyaLanzada != null) {
-                CartaTuyaLanzada.getChildren().clear();
-            }
-            if (cartaEnemiga != null) {
-                cartaEnemiga.getChildren().clear();
-            }
-            if (VboxTusCartasGanadas != null) {
-                VboxTusCartasGanadas.getChildren().clear();
-            }
-            if (VboxCartasRival != null) {
-                VboxCartasRival.getChildren().clear();
-            }
-            if (lblResultado != null) {
-                lblResultado.setText("Resultado: ¡Revancha iniciada!");
-            }
-            actualizarCabecera(rondaInicial, nombreRival, puntosIniciales);
-            renderizarMano(cartasIniciales);
+            if (lblResultado != null && mensaje != null) lblResultado.setText("Resultado: " + mensaje);
+        });
+    }
+
+    public void mostrarMensajeEstado(String mensaje) {
+        Platform.runLater(() -> {
+            if (lblResultado != null && mensaje != null) lblResultado.setText("Resultado: " + mensaje);
         });
     }
 
     @FXML
     private void onClickRevancha(ActionEvent event) {
-        if (btnRevancha != null) {
-            btnRevancha.setDisable(true);
-        }
-        if (lblResultado != null) {
-            lblResultado.setText("Resultado: Solicitando revancha...");
-        }
+        if (!revanchaPorAbandonoDisponible) return;
+        revanchaPorAbandonoDisponible = false;
+        if (btnRevancha != null) btnRevancha.setDisable(true);
 
         ClienteSocket socket = asegurarConexion();
-        MensajeProtocolo mensaje = new MensajeProtocolo();
-        mensaje.setTipo(TipoAccion.PEDIR_REVANCHA);
-        socket.enviar(mensaje);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/cliente/gui/lobby.fxml"));
+            Parent root = loader.load();
+            LobbyController lobbyController = loader.getController();
+            lobbyController.setClienteSocket(socket);
+            if (jugadorActual != null) lobbyController.setJugadorActual(jugadorActual);
+            Stage stage = (Stage) btnRevancha.getScene().getWindow();
+            stage.setScene(new Scene(root));
+
+            // Se envía tras registrar el Lobby para que los estados de cola lleguen a esa vista.
+            socket.enviar(new MensajeProtocolo(TipoAccion.PEDIR_REVANCHA));
+        } catch (IOException ex) {
+            revanchaPorAbandonoDisponible = true;
+            if (btnRevancha != null) btnRevancha.setDisable(false);
+            mostrarMensajeEstado("No se pudo volver al lobby: " + ex.getMessage());
+        }
     }
 
     @FXML
@@ -343,7 +351,7 @@ public class PartidaController {
     public void volverAlLobby() {
         Platform.runLater(() -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("lobby.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/cliente/gui/lobby.fxml"));
                 Parent root = loader.load();
                 LobbyController lobbyController = loader.getController();
                 lobbyController.setClienteSocket(clienteSocket);
@@ -360,27 +368,200 @@ public class PartidaController {
         });
     }
 
-    private VBox crearTarjetaVisual(Carta carta) {
-        VBox box = new VBox(4);
-        String nombre = (carta != null && carta.getNombre() != null) ? carta.getNombre() : "Carta";
-        String elemento = (carta != null && carta.getElemento() != null) ? carta.getElemento() : "";
-        int poder = (carta != null) ? carta.getPoder() : 0;
+    /**
+     * Construye una carta compuesta por dos imágenes distintas:
+     * 1) el retrato individual descargado desde el campo "image" de Dragon Ball API;
+     * 2) el PNG local de la raza, colocado ENCIMA como marco transparente.
+     *
+     * Los PNG (Saiyan.png, Namekiano.png, etc.) nunca sustituyen al personaje:
+     * únicamente decoran el contorno de la carta.
+     */
+    private VBox crearTarjetaVisual(Carta personaje) {
+        String nombre = personaje != null && personaje.getNombre() != null
+                ? personaje.getNombre() : "Personaje desconocido";
+        String raza = personaje != null && personaje.getRaza() != null
+                ? personaje.getRaza() : "Raza desconocida";
+        String poder = personaje != null && personaje.getPoderApi() != null
+                ? personaje.getPoderApi() : "No disponible";
 
-        box.getChildren().addAll(
-                new Label(nombre),
-                new Label(elemento),
-                new Label("Poder: " + poder)
-        );
-        return box;
+        String archivoMarco = archivoMarcoPorRaza(raza);
+        Image imagenMarco = cargarMarcoRaza(archivoMarco);
+
+        // Se conserva la proporción original de cada PNG para no deformar el marco.
+        double altoMarco = 180.0;
+        double proporcion = imagenMarco != null && imagenMarco.getHeight() > 0
+                ? imagenMarco.getWidth() / imagenMarco.getHeight() : 0.58;
+        double anchoMarco = altoMarco * proporcion;
+
+        StackPane composicion = new StackPane();
+        composicion.setPrefSize(anchoMarco, altoMarco);
+        composicion.setMinSize(anchoMarco, altoMarco);
+        composicion.setMaxSize(anchoMarco, altoMarco);
+        composicion.setPickOnBounds(false);
+
+        // Fondo oscuro dentro de la ventana transparente del marco.
+        Rectangle fondoRetrato = new Rectangle(anchoMarco * 0.70, altoMarco * 0.63);
+        fondoRetrato.setArcWidth(12);
+        fondoRetrato.setArcHeight(12);
+        fondoRetrato.setFill(javafx.scene.paint.Color.web("#101827"));
+        fondoRetrato.setTranslateY(altoMarco * 0.035);
+        fondoRetrato.setMouseTransparent(true);
+
+        Label estadoImagen = new Label("CARGANDO\nPERSONAJE...");
+        estadoImagen.setAlignment(javafx.geometry.Pos.CENTER);
+        estadoImagen.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        estadoImagen.setWrapText(true);
+        estadoImagen.setMaxWidth(anchoMarco * 0.68);
+        estadoImagen.setTranslateY(altoMarco * 0.035);
+        estadoImagen.setStyle("-fx-text-fill: #CBD5E1; -fx-font-size: 8px; -fx-font-weight: bold;");
+        estadoImagen.setMouseTransparent(true);
+
+        ImageView retratoApi = new ImageView();
+        retratoApi.setFitWidth(anchoMarco * 0.74);
+        retratoApi.setFitHeight(altoMarco * 0.65);
+        retratoApi.setPreserveRatio(true);
+        retratoApi.setSmooth(true);
+        retratoApi.setVisible(false);
+        retratoApi.setTranslateY(altoMarco * 0.035);
+        retratoApi.setMouseTransparent(true);
+
+        // El retrato se coloca primero: queda DEBAJO del marco PNG.
+        composicion.getChildren().addAll(fondoRetrato, estadoImagen, retratoApi);
+
+        String urlImagen = personaje == null ? null : personaje.getImagenUrl();
+        if (urlImagen != null) {
+            urlImagen = urlImagen.trim();
+        }
+        if (urlImagen != null && (urlImagen.startsWith("https://") || urlImagen.startsWith("http://"))) {
+            try {
+                Image imagenPersonaje = new Image(urlImagen,
+                        anchoMarco * 0.74, altoMarco * 0.65, true, true, true);
+                retratoApi.setImage(imagenPersonaje);
+
+                imagenPersonaje.progressProperty().addListener((obs, anterior, progreso) -> {
+                    if (progreso.doubleValue() >= 1.0 && !imagenPersonaje.isError()) {
+                        Platform.runLater(() -> {
+                            retratoApi.setVisible(true);
+                            estadoImagen.setVisible(false);
+                        });
+                    }
+                });
+                imagenPersonaje.errorProperty().addListener((obs, anterior, error) -> {
+                    if (Boolean.TRUE.equals(error)) {
+                        Platform.runLater(() -> estadoImagen.setText("IMAGEN NO DISPONIBLE"));
+                    }
+                });
+                // La descarga puede terminar antes de registrar los listeners.
+                if (imagenPersonaje.getProgress() >= 1.0 && !imagenPersonaje.isError()) {
+                    retratoApi.setVisible(true);
+                    estadoImagen.setVisible(false);
+                } else if (imagenPersonaje.isError()) {
+                    estadoImagen.setText("IMAGEN NO DISPONIBLE");
+                }
+            } catch (IllegalArgumentException ex) {
+                estadoImagen.setText("URL DE IMAGEN INVÁLIDA");
+            }
+        } else {
+            estadoImagen.setText("SIN IMAGEN\nEN LA API");
+        }
+
+        // Los datos se colocan dentro de la abertura inferior del marco, no fuera
+        // de la carta. Así el conjunto mantiene una altura compacta en la mano.
+        Label titulo = new Label(nombre);
+        titulo.setWrapText(true);
+        titulo.setAlignment(javafx.geometry.Pos.CENTER);
+        titulo.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        titulo.setMaxWidth(anchoMarco * 0.72);
+        titulo.setStyle("-fx-text-fill: white; -fx-font-size: 8px; -fx-font-weight: bold; -fx-text-alignment: center;");
+
+        Label datoRaza = new Label("RAZA: " + raza.toUpperCase(Locale.ROOT));
+        datoRaza.setAlignment(javafx.geometry.Pos.CENTER);
+        datoRaza.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        datoRaza.setMaxWidth(anchoMarco * 0.72);
+        datoRaza.setStyle("-fx-text-fill: #93C5FD; -fx-font-size: 6.5px; -fx-font-weight: bold;");
+
+        Label datoPoder = new Label("KI: " + poder);
+        datoPoder.setAlignment(javafx.geometry.Pos.CENTER);
+        datoPoder.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        datoPoder.setMaxWidth(anchoMarco * 0.72);
+        datoPoder.setStyle("-fx-text-fill: #F4D58D; -fx-font-size: 7px; -fx-font-weight: bold;");
+
+        VBox datosCarta = new VBox(1, titulo, datoRaza, datoPoder);
+        datosCarta.setAlignment(javafx.geometry.Pos.CENTER);
+        datosCarta.setPrefWidth(anchoMarco * 0.76);
+        datosCarta.setMaxWidth(anchoMarco * 0.76);
+        datosCarta.setTranslateY(altoMarco * 0.16);
+        datosCarta.setPadding(new javafx.geometry.Insets(3, 3, 3, 3));
+        datosCarta.setStyle("-fx-background-color: rgba(7, 14, 28, 0.78); -fx-background-radius: 5;");
+        datosCarta.setMouseTransparent(true);
+        composicion.getChildren().add(datosCarta);
+
+        // El PNG se añade al final para que sus bordes y adornos queden por encima
+        // tanto del retrato como de los datos colocados en la ventana transparente.
+        if (imagenMarco != null) {
+            ImageView vistaMarco = new ImageView(imagenMarco);
+            vistaMarco.setFitWidth(anchoMarco);
+            vistaMarco.setFitHeight(altoMarco);
+            vistaMarco.setPreserveRatio(false);
+            vistaMarco.setSmooth(true);
+            vistaMarco.setMouseTransparent(true);
+            vistaMarco.setEffect(new DropShadow(7, javafx.scene.paint.Color.rgb(0, 0, 0, 0.55)));
+            composicion.getChildren().add(vistaMarco);
+        } else {
+            System.err.println("No se encontró el PNG del marco: " + archivoMarco);
+        }
+
+        VBox tarjeta = new VBox(composicion);
+        tarjeta.setAlignment(javafx.geometry.Pos.CENTER);
+        tarjeta.setPrefSize(anchoMarco + 8, altoMarco + 8);
+        tarjeta.setMinSize(anchoMarco + 8, altoMarco + 8);
+        tarjeta.setMaxSize(anchoMarco + 8, altoMarco + 8);
+        tarjeta.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+        tarjeta.setPickOnBounds(false);
+        return tarjeta;
+    }
+
+    /** Devuelve el PNG que corresponde a la raza; el PNG se usa solamente como marco. */
+    private String archivoMarcoPorRaza(String raza) {
+        String r = raza == null ? "" : raza.toLowerCase(Locale.ROOT);
+        if (r.contains("saiyan")) return "Saiyan.png";
+        if (r.contains("namek")) return "Namekiano.png";
+        if (r.contains("majin")) return "Majin.png";
+        if (r.contains("frieza") || r.contains("freezer") || r.contains("frost demon") || r.contains("arcosian")) return "RazaFreezer.png";
+        if (r.contains("android")) return "Androides.png";
+        if (r.contains("angel")) return "Angel.png";
+        if (r.contains("god") || r.contains("destruction")) return "DiosDestruccion.png";
+        if (r.contains("human") || r.contains("earthling")) return "Humanos-Corpo.png";
+        // La API puede agregar razas nuevas. Se conserva una composición visible
+        // usando un marco disponible, sin alterar el texto real de la raza.
+        return "Saiyan.png";
+    }
+
+    /** Carga una sola vez cada marco PNG del directorio de recursos cliente/gui. */
+    private Image cargarMarcoRaza(String archivo) {
+        Image enCache = cacheMarcosRaza.get(archivo);
+        if (enCache != null) return enCache;
+
+        java.net.URL recurso = getClass().getResource("/cliente/gui/" + archivo);
+        if (recurso == null) {
+            System.err.println("No se encontró el recurso /cliente/gui/" + archivo);
+            return null;
+        }
+        Image imagen = new Image(recurso.toExternalForm(), false);
+        if (imagen.isError()) {
+            System.err.println("No se pudo leer el marco " + archivo + ": " + imagen.getException());
+            return null;
+        }
+        cacheMarcosRaza.put(archivo, imagen);
+        return imagen;
     }
 
     private String formatearCarta(Carta carta) {
-        if (carta == null) {
-            return "Carta";
-        }
+        if (carta == null) return "Personaje";
         String nombre = carta.getNombre() != null ? carta.getNombre() : "Sin nombre";
-        String elemento = carta.getElemento() != null ? carta.getElemento() : "";
-        return nombre + (elemento.isEmpty() ? "" : " [" + elemento + "]") + " - Poder " + carta.getPoder();
+        String raza = carta.getRaza() != null ? carta.getRaza() : "Raza desconocida";
+        String poder = carta.getPoderApi() != null ? carta.getPoderApi() : "No disponible";
+        return nombre + " [" + raza + "] - Ki " + poder;
     }
 
     private void bloquearMano(boolean bloqueada) {

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane prefHeight="560.0" prefWidth="820.0" styleClass="ranking-root" stylesheets="@ranking.css"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cliente.gui.GameUI.RankingController">
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+    <top>
+        <VBox spacing="6">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="14">
+                    <Label fx:id="lblTituloRanking" styleClass="ranking-titulo" text="RANKING DEL TORNEO"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnActualizar" text="ACTUALIZAR" onAction="#onClickActualizar" styleClass="ranking-boton"/>
+                    <Button fx:id="btnVolver" text="REGRESAR" onAction="#onClickVolver" styleClass="ranking-boton-secundario"/>
+                </HBox>
+                <Label text="Los guerreros con más victorias encabezan la clasificación." styleClass="ranking-subtitulo"/>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="14">
+            <padding><Insets top="24"/></padding>
+            <children>
+                <Label text="MEJORES GUERREROS" styleClass="ranking-seccion"/>
+                <TableView fx:id="tvRanking" VBox.vgrow="ALWAYS" styleClass="ranking-tabla">
+                    <columns>
+                        <TableColumn fx:id="colPosicion" text="Posición" prefWidth="100"/>
+                        <TableColumn fx:id="colGuerrero" text="Guerrero" prefWidth="250"/>
+                        <TableColumn fx:id="colVictorias" text="Victorias" prefWidth="130"/>
+                        <TableColumn fx:id="colRango" text="Rango" prefWidth="260"/>
+                    </columns>
+                </TableView>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

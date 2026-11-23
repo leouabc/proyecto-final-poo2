@@ -1,24 +1,24 @@
 package protocolo;
 
+/** Acciones intercambiadas entre el cliente y el servidor. */
 public enum TipoAccion {
     REGISTRO,
     LOGIN,
     RANKING,
+    HISTORIAL,
     VOLVER_LOBBY,
     CREAR_SALA,
     UNIRSE_SALA,
+    LISTAR_SALAS,
     BUSCAR_PARTIDA,
     CANCELAR_ESPERA,
     INICIAR_PARTIDA,
     JUGAR_CARTA,
     RESULTADO_RONDA,
     FIN_PARTIDA,
+    RIVAL_ABANDONO,
     PEDIR_REVANCHA,
-    REVANCHA_INICIADA,
     SALIR_PARTIDA,
-    DESCONECTAR
-}
-public andryck{
-    this.andryck = andryck
-        return 0;
+    DESCONECTAR,
+    CHAT
 }

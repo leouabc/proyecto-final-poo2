@@ -13,6 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import modelo.JavaBeans;
+import modelo.Carta;
+import java.util.List;
 import protocolo.MensajeProtocolo;
 import protocolo.TipoAccion;
 
@@ -76,23 +78,36 @@ public class EsperaController {
         }
         ClienteSocket socket = asegurarConexion();
         MensajeProtocolo mensaje = new MensajeProtocolo();
-        mensaje.setTipo(TipoAccion.SALIR_PARTIDA);
+        mensaje.setTipo(TipoAccion.CANCELAR_ESPERA);
         mensaje.setMensaje(codigoSala);
         socket.enviar(mensaje);
     }
 
+    public void mostrarEstado(String estado) {
+        Platform.runLater(() -> {
+            if (lblNombreDeSala != null && estado != null && !estado.isBlank()) {
+                lblNombreDeSala.setText(estado);
+            }
+        });
+    }
+
     public void onPartidaLista(int rondaInicial, String nombreRival, int puntosIniciales) {
+        onPartidaLista(rondaInicial, nombreRival, puntosIniciales, null);
+    }
+
+    public void onPartidaLista(int rondaInicial, String nombreRival, int puntosIniciales, List<Carta> mano) {
         Platform.runLater(() -> {
             if (btnCancelar != null) {
                 btnCancelar.setDisable(true);
             }
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("partida.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/cliente/gui/partida.fxml"));
                 Parent root = loader.load();
                 PartidaController partidaController = loader.getController();
                 partidaController.setClienteSocket(clienteSocket);
                 partidaController.setJugadorActual(jugadorActual);
                 partidaController.actualizarCabecera(rondaInicial, nombreRival, puntosIniciales);
+                partidaController.renderizarMano(mano);
                 Stage stage = (Stage) btnCancelar.getScene().getWindow();
                 stage.setScene(new Scene(root));
             } catch (IOException e) {
@@ -106,7 +121,7 @@ public class EsperaController {
     public void onSalaCancelada() {
         Platform.runLater(() -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("lobby.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/cliente/gui/lobby.fxml"));
                 Parent root = loader.load();
                 LobbyController lobbyController = loader.getController();
                 lobbyController.setClienteSocket(clienteSocket);

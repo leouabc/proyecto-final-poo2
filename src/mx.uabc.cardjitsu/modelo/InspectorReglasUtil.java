@@ -1,73 +1,70 @@
-package mx.uabc.cardjitsu.modelo;
+package modelo;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
 
-public class InspectorReglasUtil {
+/**
+ * Introspección JavaBeans usada durante el mapeo de datos de Dragon Ball API
+ * y para actualizar el estado de las partidas sin acoplar el código a setters concretos.
+ */
+public final class InspectorReglasUtil {
+    private InspectorReglasUtil() { }
 
-    public static void inyectarPropiedadDinamica(Object bean, String propiedad, Object valor) {
+    /**
+     * Asigna una propiedad de un JavaBean mediante Introspector/PropertyDescriptor.
+     * Devuelve false si la propiedad no existe o el valor no es compatible.
+     */
+    public static boolean inyectarPropiedadDinamica(Object bean, String propiedad, Object valor) {
+        if (bean == null || propiedad == null || propiedad.isBlank()) return false;
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass(), Object.class);
-            for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
-                if (pd.getName().equals(propiedad)) {
-                    Method setter = pd.getWriteMethod();
-                    if (setter != null) {
-                        setter.invoke(bean, valor);
-                    }
-                    break;
-                }
+            for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors()) {
+                if (!descriptor.getName().equals(propiedad)) continue;
+                Method setter = descriptor.getWriteMethod();
+                if (setter == null) return false;
+                Class<?> tipo = setter.getParameterTypes()[0];
+                if (valor != null && !tipo.isAssignableFrom(valor.getClass())) return false;
+                setter.invoke(bean, valor);
+                return true;
             }
-        } catch (Exception e) {
-            System.err.println("Error de introspección: " + e.getMessage());
+        } catch (Exception ex) {
+            System.err.println("Error de introspección en '" + propiedad + "': " + ex.getMessage());
         }
+        return false;
     }
 
-    public static void cargarCartaDesdeDragonBallAPI(Carta carta, int idPersonaje) {
+    /** Construye Carta mapeando dinámicamente las propiedades del JSON a un JavaBean. */
+    public static Carta crearCartaDesdeApi(String nombre, String raza, String imagenUrl,
+                                           String poderApi, java.math.BigDecimal escalaPoder) {
+        Carta carta = new Carta();
+        boolean correcto = inyectarPropiedadDinamica(carta, "nombre", nombre)
+                && inyectarPropiedadDinamica(carta, "raza", raza)
+                && inyectarPropiedadDinamica(carta, "imagenUrl", imagenUrl)
+                && inyectarPropiedadDinamica(carta, "poderApi", poderApi)
+                && inyectarPropiedadDinamica(carta, "escalaPoder", escalaPoder);
+        if (!correcto) {
+            throw new IllegalStateException("No fue posible mapear todos los campos de Dragon Ball API a Carta.");
+        }
+        return carta;
+    }
+
+    /** Carga una carta existente mediante el identificador oficial de Dragon Ball API. */
+    public static void cargarCartaDesdeDragonBallAPI(Carta destino, int idPersonaje) {
+        if (destino == null || idPersonaje <= 0) {
+            throw new IllegalArgumentException("La carta y el ID del personaje deben ser válidos.");
+        }
         try {
-            URL url = new URL("https://dragonball-api.com/api/characters/" + idPersonaje);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.connect();
-
-            if (conn.getResponseCode() == 200) {
-                Scanner scanner = new Scanner(url.openStream());
-                StringBuilder respuesta = new StringBuilder();
-                while (scanner.hasNext()) {
-                    respuesta.append(scanner.nextLine());
-                }
-                scanner.close();
-
-                String json = respuesta.toString();
-                
-                String nombre = extraerValorJson(json, "name");
-                String ki = extraerValorJson(json, "ki"); 
-                
-                ki = ki.replace(".", "").replace(",", "");
-                int poderCalculado = ki.equals("unknown") ? 0 : Integer.parseInt(ki);
-                inyectarPropiedadDinamica(carta, "nombre", nombre);
-                inyectarPropiedadDinamica(carta, "poder", poderCalculado);
-                inyectarPropiedadDinamica(carta, "elemento", "Fuego"); 
-                
-                System.out.println("Éxito: Se cargó e inyectó dinámicamente a " + carta.getNombre() + " con poder " + carta.getPoder());
-            } else {
-                System.out.println("No se encontró el personaje en la web.");
-            }
-        } catch (Exception e) {
-            System.err.println("Error en la conexión web: " + e.getMessage());
+            Carta origen = DragonBallApiService.obtenerPersonajePorId(idPersonaje);
+            inyectarPropiedadDinamica(destino, "nombre", origen.getNombre());
+            inyectarPropiedadDinamica(destino, "raza", origen.getRaza());
+            inyectarPropiedadDinamica(destino, "imagenUrl", origen.getImagenUrl());
+            inyectarPropiedadDinamica(destino, "poderApi", origen.getPoderApi());
+            inyectarPropiedadDinamica(destino, "escalaPoder", origen.getEscalaPoder());
+        } catch (IOException ex) {
+            throw new IllegalStateException("No fue posible cargar el personaje desde Dragon Ball API: " + ex.getMessage(), ex);
         }
-    }
-
-    private static String extraerValorJson(String json, String clave) {
-        String claveBuscada = "\"" + clave + "\":\"";
-        int inicio = json.indexOf(claveBuscada);
-        if (inicio == -1) return "0";
-        inicio += claveBuscada.length();
-        int fin = json.indexOf("\"", inicio);
-        return json.substring(inicio, fin);
     }
 }

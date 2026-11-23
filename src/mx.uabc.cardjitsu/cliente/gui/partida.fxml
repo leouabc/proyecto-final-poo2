@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1024.0" styleClass="partida-root" stylesheets="@partida.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente.gui.GameUI.PartidaController">
+<BorderPane minHeight="660.0" minWidth="1000.0" prefHeight="760.0" prefWidth="1200.0" styleClass="partida-root" stylesheets="@partida.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente.gui.GameUI.PartidaController">
    <padding>
       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
    </padding>
@@ -28,19 +28,15 @@
       </HBox>
    </top>
    <right>
-      <VBox prefHeight="200.0" prefWidth="190.0" spacing="10.0" styleClass="partida-zona-ganadas" BorderPane.alignment="CENTER">
+      <VBox prefHeight="650.0" prefWidth="360.0" minWidth="340.0" spacing="14.0" styleClass="partida-zona-ganadas" BorderPane.alignment="CENTER">
+         <padding><Insets top="16.0" right="14.0" bottom="16.0" left="14.0" /></padding>
          <children>
-            <Label text="CHAT" />
-            <VBox fx:id="VboxCartasRival" prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <TextArea fx:id="txtAreaChat" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true" />
-               </children></VBox>
-            <HBox prefHeight="31.0" prefWidth="158.0">
-               <children>
-                  <TextField fx:id="txtMensaje" alignment="TOP_LEFT" onAction="#enviarMensaje" />
-               </children>
+            <Label text="CHAT DE PARTIDA" styleClass="chat-titulo" />
+            <TextArea fx:id="txtAreaChat" editable="false" prefHeight="450.0" prefWidth="330.0" wrapText="true" promptText="Los mensajes aparecerán aquí..." VBox.vgrow="ALWAYS" styleClass="chat-historial" />
+            <HBox spacing="9.0" alignment="CENTER">
+               <TextField fx:id="txtMensaje" prefHeight="48.0" promptText="Escribe un mensaje..." onAction="#enviarMensaje" HBox.hgrow="ALWAYS" styleClass="chat-entrada" />
+               <Button fx:id="btnEnviar" minWidth="108.0" minHeight="48.0" mnemonicParsing="false" onAction="#enviarMensaje" styleClass="chat-enviar" text="ENVIAR" />
             </HBox>
-            <Button fx:id="btnEnviar" mnemonicParsing="false" onAction="#enviarMensaje" styleClass="btn-confirmar" text="ENVIAR" />
          </children>
       </VBox>
    </right>
@@ -53,41 +49,41 @@
       </VBox>
    </left>
    <center>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="14.0" styleClass="partida-arena" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" styleClass="partida-arena" BorderPane.alignment="CENTER">
          <padding>
             <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
          </padding>
          <children>
             <Label fx:id="lblResultado" text="Resultado:" />
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="28.0" stylesheets="@partida.css">
+            <VBox alignment="CENTER" spacing="10.0">
                <children>
-                  <VBox fx:id="CartaTuyaLanzada" prefHeight="200.0" prefWidth="100.0" styleClass="carta-slot" />
-                  <VBox fx:id="cartaEnemiga" prefHeight="200.0" prefWidth="100.0" styleClass="carta-slot" />
+                  <Label text="TU PERSONAJE JUGADO" styleClass="partida-personaje-titulo" />
+                  <VBox fx:id="CartaTuyaLanzada" alignment="CENTER" prefHeight="200.0" prefWidth="150.0" styleClass="carta-slot" />
                </children>
-            </HBox>
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="12.0">
+            </VBox>
+            <HBox alignment="CENTER" prefHeight="52.0" prefWidth="200.0" spacing="12.0">
                <children>
                   <Button fx:id="btnRegresar" mnemonicParsing="false" onAction="#onClickRegresar" text="REGRESAR A SALA" />
-                  <Button fx:id="btnRevancha" mnemonicParsing="false" onAction="#onClickRevancha" text="PEDIR REVANCHA" />
+                  <Button fx:id="btnRevancha" mnemonicParsing="false" onAction="#onClickRevancha" text="REVANCHA: ESPERANDO ABANDONO" />
                </children>
             </HBox>
          </children>
       </VBox>
    </center>
    <bottom>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" styleClass="partida-mano" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" prefHeight="300.0" prefWidth="100.0" spacing="8.0" styleClass="partida-mano" BorderPane.alignment="CENTER">
          <padding>
             <Insets top="12.0" />
          </padding>
          <children>
-            <Label text="Selecciona tu carta:" />
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="12.0">
+            <Label text="Selecciona un personaje por su raza y poder:" />
+            <HBox alignment="CENTER" prefHeight="190.0" prefWidth="200.0" spacing="10.0">
                <children>
-                  <VBox fx:id="carta1" prefHeight="200.0" prefWidth="100.0" styleClass="carta-slot" />
-                  <VBox fx:id="carta2" prefHeight="200.0" prefWidth="100.0" styleClass="carta-slot" />
-                  <VBox fx:id="carta3" prefHeight="200.0" prefWidth="100.0" styleClass="carta-slot" />
-                  <VBox fx:id="carta4" prefHeight="200.0" prefWidth="100.0" styleClass="carta-slot" />
-                  <VBox fx:id="carta5" prefHeight="200.0" prefWidth="100.0" styleClass="carta-slot" />
+                  <VBox fx:id="carta1" prefHeight="180.0" prefWidth="100.0" styleClass="carta-slot" />
+                  <VBox fx:id="carta2" prefHeight="180.0" prefWidth="100.0" styleClass="carta-slot" />
+                  <VBox fx:id="carta3" prefHeight="180.0" prefWidth="100.0" styleClass="carta-slot" />
+                  <VBox fx:id="carta4" prefHeight="180.0" prefWidth="100.0" styleClass="carta-slot" />
+                  <VBox fx:id="carta5" prefHeight="180.0" prefWidth="100.0" styleClass="carta-slot" />
                </children>
             </HBox>
             <Button fx:id="btnConfirmar" mnemonicParsing="false" onAction="#onClickConfirmar" styleClass="btn-confirmar" text="CONFIRMAR" />

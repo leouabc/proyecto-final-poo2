@@ -9,9 +9,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="800.0" styleClass="login-root" stylesheets="@login.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente.red.ClienteSocket">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" styleClass="login-root" stylesheets="@login.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente.red.ClienteSocket">
    <children>
-      <VBox alignment="CENTER" maxHeight="420.0" prefHeight="200.0" prefWidth="100.0" spacing="14.0" styleClass="login-card">
+      <VBox alignment="CENTER" maxHeight="520.0" prefHeight="480.0" prefWidth="560.0" spacing="12.0" styleClass="login-card">
          <padding>
             <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
          </padding>
@@ -41,7 +41,7 @@
                   <Font size="17.0" />
                </font>
             </PasswordField>
-            <Button fx:id="btnRegistrar" mnemonicParsing="false" onAction="#onClickRegistrarse" prefHeight="88.0" prefWidth="245.0" styleClass="btn-registrar" text="Registrarse en el torneo">
+            <Button fx:id="btnRegistrar" mnemonicParsing="false" onAction="#onClickRegistrarse" prefHeight="54.0" prefWidth="300.0" styleClass="btn-registrar" text="Registrarse en el torneo">
                <font>
                   <Font size="19.0" />
                </font>

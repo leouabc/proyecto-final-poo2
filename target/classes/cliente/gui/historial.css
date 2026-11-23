@@ -1,0 +1,12 @@
+.historial-root { -fx-background-color: #0a1429; }
+.historial-titulo { -fx-text-fill: #f6f7fb; -fx-font-size: 25px; -fx-font-weight: bold; }
+.historial-estado { -fx-text-fill: #aab9d2; -fx-font-size: 13px; }
+.historial-tabla { -fx-background-color: #101e38; -fx-control-inner-background: #101e38; -fx-table-cell-border-color: #263b5d; -fx-text-background-color: #e7edf8; }
+.historial-tabla .column-header-background { -fx-background-color: #172a49; }
+.historial-tabla .column-header, .historial-tabla .filler { -fx-background-color: #172a49; -fx-size: 38px; }
+.historial-tabla .column-header .label { -fx-text-fill: #f4d58d; -fx-font-weight: bold; }
+.historial-tabla .table-row-cell { -fx-background-color: #101e38; -fx-text-background-color: #e7edf8; }
+.historial-tabla .table-row-cell:odd { -fx-background-color: #142541; }
+.historial-tabla .table-row-cell:selected { -fx-background-color: #254d7b; }
+.historial-boton { -fx-background-color: #d97922; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 22; }
+.historial-boton:hover { -fx-background-color: #f09232; }

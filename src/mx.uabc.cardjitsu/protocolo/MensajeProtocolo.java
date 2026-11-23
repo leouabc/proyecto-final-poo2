@@ -3,6 +3,8 @@ package protocolo;
 import java.io.Serializable;
 import java.util.List;
 import modelo.JavaBeans;
+import modelo.Carta;
+import modelo.HistorialPartida;
 
 public class MensajeProtocolo implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -14,11 +16,18 @@ public class MensajeProtocolo implements Serializable {
     private String mensaje;
     private JavaBeans jugador;
     private List<JavaBeans> ranking;
+    private List<HistorialPartida> historial;
     private int indiceCarta;
     private List<String> mano;
+    private List<Carta> cartasMano;
     private int ronda;
     private String cartaPropia;
     private String cartaRival;
+    private Carta cartaPropiaDatos;
+    private Carta cartaRivalDatos;
+    private String salaCodigo;
+    private String salaNombre;
+    private List<String> salasDisponibles;
 
     public MensajeProtocolo() {
     }
@@ -83,6 +92,14 @@ public class MensajeProtocolo implements Serializable {
         this.ranking = ranking;
     }
 
+    public List<HistorialPartida> getHistorial() {
+        return historial;
+    }
+
+    public void setHistorial(List<HistorialPartida> historial) {
+        this.historial = historial;
+    }
+
     public int getIndiceCarta() {
         return indiceCarta;
     }
@@ -97,6 +114,14 @@ public class MensajeProtocolo implements Serializable {
 
     public void setMano(List<String> mano) {
         this.mano = mano;
+    }
+
+    public List<Carta> getCartasMano() {
+        return cartasMano;
+    }
+
+    public void setCartasMano(List<Carta> cartasMano) {
+        this.cartasMano = cartasMano;
     }
 
     public int getRonda() {
@@ -114,6 +139,19 @@ public class MensajeProtocolo implements Serializable {
     public void setCartaPropia(String cartaPropia) {
         this.cartaPropia = cartaPropia;
     }
+
+    public Carta getCartaPropiaDatos() { return cartaPropiaDatos; }
+    public void setCartaPropiaDatos(Carta cartaPropiaDatos) { this.cartaPropiaDatos = cartaPropiaDatos; }
+
+    public Carta getCartaRivalDatos() { return cartaRivalDatos; }
+    public void setCartaRivalDatos(Carta cartaRivalDatos) { this.cartaRivalDatos = cartaRivalDatos; }
+
+    public String getSalaCodigo() { return salaCodigo; }
+    public void setSalaCodigo(String salaCodigo) { this.salaCodigo = salaCodigo; }
+    public String getSalaNombre() { return salaNombre; }
+    public void setSalaNombre(String salaNombre) { this.salaNombre = salaNombre; }
+    public List<String> getSalasDisponibles() { return salasDisponibles; }
+    public void setSalasDisponibles(List<String> salasDisponibles) { this.salasDisponibles = salasDisponibles; }
 
     public String getCartaRival() {
         return cartaRival;

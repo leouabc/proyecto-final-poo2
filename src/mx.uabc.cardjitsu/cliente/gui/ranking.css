@@ -99,3 +99,34 @@
     -fx-font-size: 13px;
     -fx-font-weight: bold;
 }
+.ranking-seccion {
+    -fx-text-fill: #f8fafc;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+.ranking-boton, .ranking-boton-secundario {
+    -fx-background-radius: 8;
+    -fx-padding: 9 16;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.ranking-boton {
+    -fx-background-color: linear-gradient(to right, #ea580c, #f59e0b);
+    -fx-text-fill: white;
+}
+.ranking-boton-secundario {
+    -fx-background-color: #243653;
+    -fx-text-fill: #e2e8f0;
+    -fx-border-color: #64748b;
+    -fx-border-radius: 8;
+}
+.ranking-tabla .table-row-cell {
+    -fx-background-color: #0c1930;
+    -fx-cell-size: 42px;
+}
+.ranking-tabla .table-row-cell:odd { -fx-background-color: #10213d; }
+.ranking-tabla .table-row-cell:filled:hover { -fx-background-color: #263d61; }
+.ranking-tabla .placeholder .label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 14px;
+}
