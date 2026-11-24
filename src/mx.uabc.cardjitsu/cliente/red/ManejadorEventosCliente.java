@@ -7,7 +7,6 @@ import cliente.gui.GameUI.PartidaController;
 import cliente.gui.GameUI.RankingController;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.List;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;

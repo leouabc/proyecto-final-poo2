@@ -20,7 +20,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.effect.DropShadow;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Locale;
