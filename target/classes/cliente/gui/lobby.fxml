@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="560.0" minWidth="760.0" prefHeight="620.0" prefWidth="860.0" styleClass="lobby-root" stylesheets="@lobby.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente.gui.GameUI.LobbyController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="560.0" minWidth="760.0" prefHeight="620.0" prefWidth="860.0" styleClass="lobby-root" stylesheets="@lobby.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cliente.gui.GameUI.LobbyController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="72.0" prefWidth="200.0" spacing="12.0" BorderPane.alignment="CENTER">
          <padding>
@@ -22,7 +22,7 @@
             <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
             <HBox alignment="CENTER_RIGHT" spacing="8">
                <children>
-                  <Button fx:id="btnHistorial" mnemonicParsing="false" onAction="#onClickHistorial" text="HISTORIAL" />
+                  <Button fx:id="btnHistorial" mnemonicParsing="false" onAction="#onClickHistorial" styleClass="btn-ranking" text="HISTORIAL" />
                   <Button fx:id="btnRanking" mnemonicParsing="false" onAction="#onClickRanking" styleClass="btn-ranking" text="RANKING" />
                </children>
             </HBox>
@@ -49,7 +49,7 @@
          <children>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="16.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#onClickPartidaRapida" text="PARTIDA RÁPIDA" />
+                  <Button mnemonicParsing="false" onAction="#onClickPartidaRapida" styleClass="btn-unirse" text="PARTIDA RÁPIDA" />
                   <Button fx:id="btnCrearSalas" mnemonicParsing="false" onAction="#onClickCrear" styleClass="btn-crear" text="CREAR SALA" />
                   <Button fx:id="btnUnirse" mnemonicParsing="false" onAction="#onClickUnirse" styleClass="btn-unirse" text="UNIRSE A SALA" />
                </children>
