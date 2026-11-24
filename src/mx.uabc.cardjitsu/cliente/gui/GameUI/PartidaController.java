@@ -259,7 +259,12 @@ public class PartidaController {
             }
             boolean empate = resultadoTexto != null && resultadoTexto.toLowerCase().contains("empate");
             if (!empate && ganoRonda && cartaRival != null && VboxTusCartasGanadas != null) {
-                VboxTusCartasGanadas.getChildren().add(crearTarjetaVisual(cartaRival));
+                VBox cartaGanada = crearTarjetaVisual(cartaRival);
+                // Mantener el ancho real de la carta; expandir este VBox provoca
+                // que el clip interno recorte la mitad derecha de la imagen.
+                cartaGanada.setMaxWidth(cartaGanada.getPrefWidth());
+                cartaGanada.setMinWidth(cartaGanada.getPrefWidth());
+                VboxTusCartasGanadas.getChildren().add(cartaGanada);
             }
             if (lblResultado != null) {
                 lblResultado.setText("Resultado: " + (resultadoTexto != null ? resultadoTexto : ""));
@@ -385,13 +390,8 @@ public class PartidaController {
         composicion.setMinSize(anchoMarco, altoMarco);
         composicion.setMaxSize(anchoMarco, altoMarco);
         composicion.setPickOnBounds(false);
+        composicion.setClip(new Rectangle(anchoMarco, altoMarco));
 
-        Rectangle fondoRetrato = new Rectangle(anchoMarco * 0.70, altoMarco * 0.63);
-        fondoRetrato.setArcWidth(12);
-        fondoRetrato.setArcHeight(12);
-        fondoRetrato.setFill(javafx.scene.paint.Color.web("#101827"));
-        fondoRetrato.setTranslateY(altoMarco * 0.035);
-        fondoRetrato.setMouseTransparent(true);
 
         Label estadoImagen = new Label("CARGANDO\nPERSONAJE...");
         estadoImagen.setAlignment(javafx.geometry.Pos.CENTER);
@@ -403,14 +403,16 @@ public class PartidaController {
         estadoImagen.setMouseTransparent(true);
 
         ImageView retratoApi = new ImageView();
-        retratoApi.setFitWidth(anchoMarco * 0.74);
-        retratoApi.setFitHeight(altoMarco * 0.65);
+        retratoApi.setFitWidth(anchoMarco * 0.82);
+        retratoApi.setFitHeight(altoMarco * 0.76);
         retratoApi.setPreserveRatio(true);
         retratoApi.setSmooth(true);
         retratoApi.setVisible(false);
         retratoApi.setTranslateY(altoMarco * 0.035);
         retratoApi.setMouseTransparent(true);
-        composicion.getChildren().addAll(fondoRetrato, estadoImagen, retratoApi);
+        // No se coloca un rectángulo oscuro detrás del retrato: el interior
+        // transparente del marco permite ver al personaje sin un bloque negro.
+        composicion.getChildren().addAll(estadoImagen, retratoApi);
 
         String urlImagen = personaje == null ? null : personaje.getImagenUrl();
         if (urlImagen != null) {
@@ -419,7 +421,7 @@ public class PartidaController {
         if (urlImagen != null && (urlImagen.startsWith("https://") || urlImagen.startsWith("http://"))) {
             try {
                 Image imagenPersonaje = new Image(urlImagen,
-                        anchoMarco * 0.74, altoMarco * 0.65, true, true, true);
+                        anchoMarco * 0.82, altoMarco * 0.76, true, true, true);
                 retratoApi.setImage(imagenPersonaje);
 
                 imagenPersonaje.progressProperty().addListener((obs, anterior, progreso) -> {
@@ -473,7 +475,8 @@ public class PartidaController {
         datosCarta.setMaxWidth(anchoMarco * 0.76);
         datosCarta.setTranslateY(altoMarco * 0.16);
         datosCarta.setPadding(new javafx.geometry.Insets(3, 3, 3, 3));
-        datosCarta.setStyle("-fx-background-color: rgba(7, 14, 28, 0.78); -fx-background-radius: 5;");
+        // Texto sin placa oscura: conserva visible el personaje detrás de los datos.
+        datosCarta.setStyle("-fx-background-color: transparent; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.95), 3, 0.8, 0, 1);");
         datosCarta.setMouseTransparent(true);
         composicion.getChildren().add(datosCarta);
 
@@ -484,7 +487,11 @@ public class PartidaController {
             vistaMarco.setPreserveRatio(false);
             vistaMarco.setSmooth(true);
             vistaMarco.setMouseTransparent(true);
-            vistaMarco.setEffect(new DropShadow(7, javafx.scene.paint.Color.rgb(0, 0, 0, 0.55)));
+            // El marco deja pasar más imagen para que el personaje destaque.
+            vistaMarco.setOpacity(0.42);
+            // Sin sombra exterior para evitar que aparezcan bloques oscuros
+            // fuera del contorno de la carta.
+            vistaMarco.setEffect(null);
             composicion.getChildren().add(vistaMarco);
         } else {
             System.err.println("No se encontró el PNG del marco: " + archivoMarco);
@@ -492,11 +499,14 @@ public class PartidaController {
 
         VBox tarjeta = new VBox(composicion);
         tarjeta.setAlignment(javafx.geometry.Pos.CENTER);
-        tarjeta.setPrefSize(anchoMarco + 8, altoMarco + 8);
-        tarjeta.setMinSize(anchoMarco + 8, altoMarco + 8);
-        tarjeta.setMaxSize(anchoMarco + 8, altoMarco + 8);
+        // La tarjeta ocupa exactamente el tamaño del marco: evita el borde vacío
+        // que antes aparecía al colocarla en la mano o en el área de cartas ganadas.
+        tarjeta.setPrefSize(anchoMarco, altoMarco);
+        tarjeta.setMinSize(anchoMarco, altoMarco);
+        tarjeta.setMaxSize(anchoMarco, altoMarco);
         tarjeta.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
         tarjeta.setPickOnBounds(false);
+        tarjeta.setClip(new Rectangle(anchoMarco, altoMarco));
         return tarjeta;
     }
 

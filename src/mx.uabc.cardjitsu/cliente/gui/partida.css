@@ -200,3 +200,34 @@
 .chat-enviar:disabled {
     -fx-opacity: 0.55;
 }
+
+/* Colección de cartas ganadas: el contenido crece y el panel permite desplazarse. */
+.cartas-ganadas-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 2 0 2 0;
+}
+.cartas-ganadas-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+.cartas-ganadas-scroll .scroll-bar:vertical {
+    -fx-background-color: rgba(15, 23, 42, 0.55);
+    -fx-pref-width: 10px;
+}
+.cartas-ganadas-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #3b82f6;
+    -fx-background-radius: 8px;
+}
+.cartas-ganadas-scroll .scroll-bar:vertical .track {
+    -fx-background-color: rgba(30, 41, 59, 0.45);
+    -fx-background-radius: 8px;
+}
+
+/* Las cartas ganadas conservan su ancho natural y quedan centradas completas. */
+.cartas-ganadas-scroll {
+    -fx-fit-to-width: false;
+}
+.cartas-ganadas-scroll .viewport {
+    -fx-background-color: transparent;
+}
