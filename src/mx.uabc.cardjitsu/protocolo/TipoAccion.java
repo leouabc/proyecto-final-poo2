@@ -1,6 +1,5 @@
 package protocolo;
 
-/** Acciones intercambiadas entre el cliente y el servidor. */
 public enum TipoAccion {
     REGISTRO,
     LOGIN,

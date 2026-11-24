@@ -3,16 +3,13 @@ package modelo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-/** Carta construida con los datos reales que entrega Dragon Ball API. */
 public class Carta implements Serializable {
     private static final long serialVersionUID = 2L;
 
     private String nombre;
     private String raza;
     private String imagenUrl;
-    /** Texto original del campo ki devuelto por la API (por ejemplo, "60 Septillion"). */
     private String poderApi;
-    /** Valor normalizado para comparar poderes sin perder la escala indicada por la API. */
     private BigDecimal escalaPoder = BigDecimal.ZERO;
 
     public Carta() { }

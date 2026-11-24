@@ -5,7 +5,6 @@ import java.util.Base64;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-/** Hash de contraseñas PBKDF2 con sal aleatoria individual. */
 final class PasswordUtil {
     private static final int ITERACIONES = 120_000;
     private static final int BYTES = 32;

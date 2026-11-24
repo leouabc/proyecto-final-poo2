@@ -14,11 +14,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Cliente único de Dragon Ball API compartido por el servidor y el cliente.
- * El ki se conserva tal como lo entrega la API y se normaliza solo para comparar
- * correctamente los valores durante el combate.
- */
+
 public final class DragonBallApiService {
     private static final String ENDPOINT = "https://dragonball-api.com/api/characters?page=1&limit=100";
     private static final HttpClient HTTP = HttpClient.newBuilder()
@@ -29,7 +25,6 @@ public final class DragonBallApiService {
 
     private DragonBallApiService() { }
 
-    /** Descarga una sola vez la colección completa y reutiliza la caché. */
     public static List<Carta> obtenerPersonajes() throws IOException {
         List<Carta> disponibles = cachePersonajes;
         if (disponibles != null && !disponibles.isEmpty()) return copiarLista(disponibles);
@@ -62,7 +57,6 @@ public final class DragonBallApiService {
         }
     }
 
-    /** Consulta un personaje individual por su identificador oficial de la API. */
     public static Carta obtenerPersonajePorId(int id) throws IOException {
         if (id <= 0) throw new IllegalArgumentException("El ID debe ser positivo.");
         HttpRequest request = HttpRequest.newBuilder(URI.create("https://dragonball-api.com/api/characters/" + id))
@@ -84,7 +78,6 @@ public final class DragonBallApiService {
         return json == null ? null : parsearPersonaje(json);
     }
 
-    /** Método público para probar el mapeo JSON sin depender de Internet. */
     public static List<Carta> parsearRespuesta(String json) throws IOException {
         if (json == null || json.isBlank()) throw new IOException("La respuesta de Dragon Ball API está vacía.");
         int itemsKey = json.indexOf("\"items\"");
@@ -148,15 +141,11 @@ public final class DragonBallApiService {
         String nombre = campo(objeto, "name");
         String raza = campo(objeto, "race");
         String imagen = campo(objeto, "image");
-        // El poder de la carta procede únicamente del campo ki de Dragon Ball API.
-        // No se sustituye por maxKi ni por valores predeterminados locales.
         String ki = campo(objeto, "ki");
         if (nombre == null || esDesconocido(raza) || imagen == null || esDesconocido(ki)) return null;
         if (!(imagen.startsWith("https://") || imagen.startsWith("http://"))) return null;
         BigDecimal valor = convertirEscala(ki);
         if (valor == null) return null;
-
-        // Convierte el .webp de la API a .png al vuelo para que JavaFX pueda dibujarlo
         String imagenCompatible = "https://wsrv.nl/?url=" + imagen.trim() + "&output=png";
 
         return InspectorReglasUtil.crearCartaDesdeApi(
@@ -210,7 +199,6 @@ public final class DragonBallApiService {
                 || "n/a".equalsIgnoreCase(valor.trim());
     }
 
-    /** Convierte valores como "60 Septillion" a un número comparable sin alterar el texto mostrado. */
     private static BigDecimal convertirEscala(String texto) {
         if (esDesconocido(texto)) return null;
         String limpio = texto.trim().toLowerCase(Locale.ROOT).replace(",", "");

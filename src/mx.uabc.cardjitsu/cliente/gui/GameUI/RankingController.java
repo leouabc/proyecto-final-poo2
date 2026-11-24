@@ -57,7 +57,6 @@ public class RankingController {
         configurarTabla();
     }
 
-    /** Se registra después de colocar la escena, para que las respuestas lleguen a la vista visible. */
     public void activar() {
         ManejadorEventosCliente.registrarRanking(this);
     }
@@ -74,7 +73,6 @@ public class RankingController {
         }
     }
 
-    /** Construye una tabla equivalente cuando el archivo FXML no puede cargarse. */
     public Parent crearVistaRespaldo() {
         lblTituloRanking = new Label("RANKING DEL TORNEO");
         lblTituloRanking.getStyleClass().add("ranking-titulo");
@@ -133,7 +131,6 @@ public class RankingController {
         this.clienteSocket = clienteSocket;
     }
 
-    /** La vista ya está activa antes de solicitar, así la respuesta se entrega al controlador correcto. */
     public void solicitarRanking() {
         if (btnActualizar != null) btnActualizar.setDisable(true);
         MensajeProtocolo mensaje = new MensajeProtocolo(TipoAccion.RANKING);
@@ -181,7 +178,6 @@ public class RankingController {
         });
     }
 
-    /** Modelo de fila independiente del modelo persistente JavaBeans. */
     public static final class FilaRanking {
         private final javafx.beans.property.IntegerProperty posicion = new javafx.beans.property.SimpleIntegerProperty();
         private final javafx.beans.property.StringProperty guerrero = new javafx.beans.property.SimpleStringProperty();

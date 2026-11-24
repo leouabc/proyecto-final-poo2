@@ -22,7 +22,6 @@ import protocolo.MensajeProtocolo;
 import protocolo.TipoAccion;
 import servidor.datos.RepositorioJugadores;
 
-/** Sala de combate. Todas las cartas y sus poderes provienen de Dragon Ball API. */
 public class SalaJuego {
     private static final Queue<HiloCliente> colaEspera = new LinkedList<>();
     private static final Map<String, HiloCliente> salasPendientes = new LinkedHashMap<>();
@@ -44,7 +43,6 @@ public class SalaJuego {
     private final RepositorioJugadores repositorio;
     private boolean resultadoRegistrado;
     private String codigoSala;
-    /** JavaBeans que representan el estado real del encuentro compartido. */
     private final EstadoJuego estadoCompartido = new EstadoJuego();
     private final Jugador estadoJugador1 = new Jugador();
     private final Jugador estadoJugador2 = new Jugador();
@@ -76,8 +74,6 @@ public class SalaJuego {
             if (creador == null || !creador.isConectado() || creador == invitado) return false;
         }
 
-        // La llamada HTTP se hace fuera del monitor global para no bloquear
-        // otras salas, el matchmaking ni las operaciones de desconexión.
         final List<Carta> pool;
         try {
             pool = DragonBallApiService.obtenerPersonajes();
@@ -89,11 +85,10 @@ public class SalaJuego {
                     enviarErrorSala(invitado, clave, ultimoErrorSala);
                 }
             }
-            return true; // La solicitud fue atendida, la sala sigue disponible para reintentar.
+            return true;
         }
 
         synchronized (SalaJuego.class) {
-            // Revalidar porque el creador pudo cancelar mientras se descargaba el catálogo.
             if (salasPendientes.get(clave) != creador || !creador.isConectado()
                     || !invitado.isConectado() || invitado.getSalaActual() != null) return false;
             salasPendientes.remove(clave);
@@ -204,7 +199,6 @@ public class SalaJuego {
         InspectorReglasUtil.inyectarPropiedadDinamica(estadoCompartido, "jugador2", estadoJugador2);
     }
 
-    /** Actualiza EstadoJuego y Jugador usando las propiedades JavaBean inspeccionadas dinámicamente. */
     private void sincronizarEstado(String fase, String ganadorRonda) {
         InspectorReglasUtil.inyectarPropiedadDinamica(estadoCompartido, "faseActual", fase);
         InspectorReglasUtil.inyectarPropiedadDinamica(estadoCompartido, "ganadorRonda", ganadorRonda);
@@ -251,7 +245,6 @@ public class SalaJuego {
         return nombres;
     }
 
-    /** Empareja jugadores sin mantener el lock global mientras se consulta la API. */
     public static void emparejarJugador(HiloCliente cliente) {
         synchronized (SalaJuego.class) {
             if (cliente == null || !cliente.isConectado() || cliente.getJugadorActual() == null
@@ -270,7 +263,6 @@ public class SalaJuego {
         }
 
         synchronized (SalaJuego.class) {
-            // Validar de nuevo después del HTTP para impedir dobles emparejamientos.
             if (!cliente.isConectado() || cliente.getJugadorActual() == null
                     || cliente.getSalaActual() != null || colaEspera.contains(cliente)) return;
 
@@ -314,7 +306,7 @@ public class SalaJuego {
         if (mano == null || indiceCarta >= mano.size()) return;
         if (jugador == jugador1 && indiceJugado1 == null) indiceJugado1 = indiceCarta;
         else if (jugador == jugador2 && indiceJugado2 == null) indiceJugado2 = indiceCarta;
-        else return; // Ignora jugadas duplicadas del mismo cliente.
+        else return;
 
         if (indiceJugado1 != null && indiceJugado2 != null) {
             sincronizarEstado("RESOLVIENDO_RONDA", null);
@@ -377,7 +369,6 @@ public class SalaJuego {
         return ganador == jugador ? "Ganaste la ronda por escala de poder." : "Perdiste la ronda por escala de poder.";
     }
 
-    /** El combate compara el ki/poder normalizado que se recibió directamente de la API. */
     private int determinarGanadorRonda(Carta carta1, Carta carta2) {
         BigDecimal poder1 = carta1.getEscalaPoder();
         BigDecimal poder2 = carta2.getEscalaPoder();
@@ -447,7 +438,6 @@ public class SalaJuego {
         destinatario.enviar(mensaje);
     }
 
-    /** Notifica siempre al jugador que permanece, incluso si la partida ya había terminado. */
     public synchronized void notificarAbandono(HiloCliente quienSalio) {
         if (quienSalio != jugador1 && quienSalio != jugador2) return;
         HiloCliente restante = quienSalio == jugador1 ? jugador2 : jugador1;

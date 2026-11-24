@@ -12,10 +12,7 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import servidor.datos.ManejadorDB4O;
 
-/**
- * Servidor principal. Cada conexión se atiende con su propio HiloCliente;
- * los mensajes de cada jugador ya no se difunden indiscriminadamente a todos.
- */
+
 public class ServidorSocket extends Application {
     private static final int PUERTO = 35557;
 
@@ -91,7 +88,6 @@ public class ServidorSocket extends Application {
 
     @FXML
     public void initialize() {
-        // La interfaz no requiere inicialización adicional.
     }
 
     public static void main(String[] args) {

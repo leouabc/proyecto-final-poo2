@@ -25,7 +25,6 @@ public class ManejadorEventosCliente extends Application {
     private static volatile RankingController rankingActivo;
     private static volatile HistorialController historialActivo;
     private static volatile ClienteSocket clienteSocketActual;
-    // INICIAR_PARTIDA puede llegar mientras JavaFX todavía está cargando la vista de espera.
     private static volatile MensajeProtocolo inicioPartidaPendiente;
 
     public static void registrarLobby(LobbyController controller) {
@@ -110,10 +109,8 @@ public class ManejadorEventosCliente extends Application {
                 if (lobbyActivo != null) lobbyActivo.mostrarEstado(msg.getMensaje());
                 else if (esperaActiva != null) esperaActiva.mostrarEstado(msg.getMensaje());
             } else if (lobbyActivo != null) {
-                // Solo se abre la espera cuando realmente comienza una búsqueda.
                 lobbyActivo.onBusquedaPartida(msg.getMensaje());
             } else if (esperaActiva != null) {
-                // El jugador que ya estaba en cola permanece en su espera.
                 esperaActiva.mostrarEstado(msg.getMensaje());
             }
         } else if (tipo == TipoAccion.CREAR_SALA || tipo == TipoAccion.UNIRSE_SALA) {

@@ -88,7 +88,6 @@ public class PartidaController {
     private JavaBeans jugadorActual;
     private List<Carta> manoActual = new ArrayList<>();
     private final List<VBox> slotsMano = new ArrayList<>();
-    /** Caché local de los marcos PNG; son capas decorativas, no retratos de personajes. */
     private final Map<String, Image> cacheMarcosRaza = new HashMap<>();
     private int indiceSeleccionado = -1;
     private boolean jugadaConfirmada;
@@ -291,7 +290,6 @@ public class PartidaController {
         });
     }
 
-    /** Solo un evento RIVAL_ABANDONO del servidor permite volver a buscar combate. */
     public void habilitarRevanchaPorAbandono(String mensaje) {
         Platform.runLater(() -> {
             revanchaPorAbandonoDisponible = true;
@@ -324,8 +322,6 @@ public class PartidaController {
             if (jugadorActual != null) lobbyController.setJugadorActual(jugadorActual);
             Stage stage = (Stage) btnRevancha.getScene().getWindow();
             stage.setScene(new Scene(root));
-
-            // Se envía tras registrar el Lobby para que los estados de cola lleguen a esa vista.
             socket.enviar(new MensajeProtocolo(TipoAccion.PEDIR_REVANCHA));
         } catch (IOException ex) {
             revanchaPorAbandonoDisponible = true;
@@ -368,14 +364,6 @@ public class PartidaController {
         });
     }
 
-    /**
-     * Construye una carta compuesta por dos imágenes distintas:
-     * 1) el retrato individual descargado desde el campo "image" de Dragon Ball API;
-     * 2) el PNG local de la raza, colocado ENCIMA como marco transparente.
-     *
-     * Los PNG (Saiyan.png, Namekiano.png, etc.) nunca sustituyen al personaje:
-     * únicamente decoran el contorno de la carta.
-     */
     private VBox crearTarjetaVisual(Carta personaje) {
         String nombre = personaje != null && personaje.getNombre() != null
                 ? personaje.getNombre() : "Personaje desconocido";
@@ -387,7 +375,6 @@ public class PartidaController {
         String archivoMarco = archivoMarcoPorRaza(raza);
         Image imagenMarco = cargarMarcoRaza(archivoMarco);
 
-        // Se conserva la proporción original de cada PNG para no deformar el marco.
         double altoMarco = 180.0;
         double proporcion = imagenMarco != null && imagenMarco.getHeight() > 0
                 ? imagenMarco.getWidth() / imagenMarco.getHeight() : 0.58;
@@ -399,7 +386,6 @@ public class PartidaController {
         composicion.setMaxSize(anchoMarco, altoMarco);
         composicion.setPickOnBounds(false);
 
-        // Fondo oscuro dentro de la ventana transparente del marco.
         Rectangle fondoRetrato = new Rectangle(anchoMarco * 0.70, altoMarco * 0.63);
         fondoRetrato.setArcWidth(12);
         fondoRetrato.setArcHeight(12);
@@ -424,8 +410,6 @@ public class PartidaController {
         retratoApi.setVisible(false);
         retratoApi.setTranslateY(altoMarco * 0.035);
         retratoApi.setMouseTransparent(true);
-
-        // El retrato se coloca primero: queda DEBAJO del marco PNG.
         composicion.getChildren().addAll(fondoRetrato, estadoImagen, retratoApi);
 
         String urlImagen = personaje == null ? null : personaje.getImagenUrl();
@@ -451,7 +435,6 @@ public class PartidaController {
                         Platform.runLater(() -> estadoImagen.setText("IMAGEN NO DISPONIBLE"));
                     }
                 });
-                // La descarga puede terminar antes de registrar los listeners.
                 if (imagenPersonaje.getProgress() >= 1.0 && !imagenPersonaje.isError()) {
                     retratoApi.setVisible(true);
                     estadoImagen.setVisible(false);
@@ -465,8 +448,6 @@ public class PartidaController {
             estadoImagen.setText("SIN IMAGEN\nEN LA API");
         }
 
-        // Los datos se colocan dentro de la abertura inferior del marco, no fuera
-        // de la carta. Así el conjunto mantiene una altura compacta en la mano.
         Label titulo = new Label(nombre);
         titulo.setWrapText(true);
         titulo.setAlignment(javafx.geometry.Pos.CENTER);
@@ -496,8 +477,6 @@ public class PartidaController {
         datosCarta.setMouseTransparent(true);
         composicion.getChildren().add(datosCarta);
 
-        // El PNG se añade al final para que sus bordes y adornos queden por encima
-        // tanto del retrato como de los datos colocados en la ventana transparente.
         if (imagenMarco != null) {
             ImageView vistaMarco = new ImageView(imagenMarco);
             vistaMarco.setFitWidth(anchoMarco);
@@ -521,7 +500,6 @@ public class PartidaController {
         return tarjeta;
     }
 
-    /** Devuelve el PNG que corresponde a la raza; el PNG se usa solamente como marco. */
     private String archivoMarcoPorRaza(String raza) {
         String r = raza == null ? "" : raza.toLowerCase(Locale.ROOT);
         if (r.contains("saiyan")) return "Saiyan.png";
@@ -532,12 +510,9 @@ public class PartidaController {
         if (r.contains("angel")) return "Angel.png";
         if (r.contains("god") || r.contains("destruction")) return "DiosDestruccion.png";
         if (r.contains("human") || r.contains("earthling")) return "Humanos-Corpo.png";
-        // La API puede agregar razas nuevas. Se conserva una composición visible
-        // usando un marco disponible, sin alterar el texto real de la raza.
         return "Saiyan.png";
     }
 
-    /** Carga una sola vez cada marco PNG del directorio de recursos cliente/gui. */
     private Image cargarMarcoRaza(String archivo) {
         Image enCache = cacheMarcosRaza.get(archivo);
         if (enCache != null) return enCache;

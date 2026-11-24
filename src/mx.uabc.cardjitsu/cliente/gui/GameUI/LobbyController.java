@@ -128,7 +128,6 @@ public class LobbyController {
     }
 
 
-    /** Abre la pantalla de espera para una búsqueda rápida o una revancha. */
     public void onBusquedaPartida(String estado) {
         Platform.runLater(() -> {
             try {
@@ -269,7 +268,6 @@ public class LobbyController {
             rankingController.setClienteSocket(socket);
             rankingController.setJugadorActual(jugadorActual);
         } catch (Exception errorFxml) {
-            // La navegación no debe quedar bloqueada por un error de FXML o de CSS.
             rankingController = new RankingController();
             rankingController.setClienteSocket(socket);
             rankingController.setJugadorActual(jugadorActual);

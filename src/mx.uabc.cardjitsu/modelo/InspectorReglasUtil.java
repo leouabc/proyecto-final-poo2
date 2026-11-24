@@ -6,17 +6,10 @@ import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-/**
- * Introspección JavaBeans usada durante el mapeo de datos de Dragon Ball API
- * y para actualizar el estado de las partidas sin acoplar el código a setters concretos.
- */
 public final class InspectorReglasUtil {
     private InspectorReglasUtil() { }
 
-    /**
-     * Asigna una propiedad de un JavaBean mediante Introspector/PropertyDescriptor.
-     * Devuelve false si la propiedad no existe o el valor no es compatible.
-     */
+
     public static boolean inyectarPropiedadDinamica(Object bean, String propiedad, Object valor) {
         if (bean == null || propiedad == null || propiedad.isBlank()) return false;
         try {
@@ -36,9 +29,7 @@ public final class InspectorReglasUtil {
         return false;
     }
 
-    /** Construye Carta mapeando dinámicamente las propiedades del JSON a un JavaBean. */
-    public static Carta crearCartaDesdeApi(String nombre, String raza, String imagenUrl,
-                                           String poderApi, java.math.BigDecimal escalaPoder) {
+    public static Carta crearCartaDesdeApi(String nombre, String raza, String imagenUrl, String poderApi, java.math.BigDecimal escalaPoder) {
         Carta carta = new Carta();
         boolean correcto = inyectarPropiedadDinamica(carta, "nombre", nombre)
                 && inyectarPropiedadDinamica(carta, "raza", raza)
@@ -51,7 +42,6 @@ public final class InspectorReglasUtil {
         return carta;
     }
 
-    /** Carga una carta existente mediante el identificador oficial de Dragon Ball API. */
     public static void cargarCartaDesdeDragonBallAPI(Carta destino, int idPersonaje) {
         if (destino == null || idPersonaje <= 0) {
             throw new IllegalArgumentException("La carta y el ID del personaje deben ser válidos.");

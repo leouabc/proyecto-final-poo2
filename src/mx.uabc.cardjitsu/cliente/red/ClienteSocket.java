@@ -22,7 +22,6 @@ import modelo.JavaBeans;
 import protocolo.MensajeProtocolo;
 import protocolo.TipoAccion;
 
-/** Cliente de red y controlador de la pantalla de acceso. */
 public class ClienteSocket {
     private static final String HOST = System.getProperty("cardjitsu.host", "localhost");
     private static final int PUERTO = Integer.getInteger("cardjitsu.port", 35557);
@@ -139,7 +138,6 @@ public class ClienteSocket {
         return true;
     }
 
-    /** Se invoca desde el hilo de lectura cuando el servidor responde. */
     public void procesarRespuestaAcceso(MensajeProtocolo respuesta) {
         Platform.runLater(() -> {
             if (respuesta.getTipo() == TipoAccion.REGISTRO) {

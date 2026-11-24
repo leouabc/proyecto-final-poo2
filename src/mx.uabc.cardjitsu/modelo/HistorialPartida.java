@@ -2,7 +2,6 @@ package modelo;
 
 import java.io.Serializable;
 
-/** Registro persistente de un enfrentamiento. No almacena contraseñas ni datos sensibles. */
 public class HistorialPartida implements Serializable {
     private static final long serialVersionUID = 1L;
 

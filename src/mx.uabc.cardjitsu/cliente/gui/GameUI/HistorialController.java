@@ -26,7 +26,6 @@ import modelo.JavaBeans;
 import protocolo.MensajeProtocolo;
 import protocolo.TipoAccion;
 
-/** Vista de consulta del historial de partidas persistido en DB4O. */
 public class HistorialController {
     private static final DateTimeFormatter FORMATO_FECHA =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault());
