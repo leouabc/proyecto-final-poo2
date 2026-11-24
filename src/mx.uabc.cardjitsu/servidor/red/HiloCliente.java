@@ -194,7 +194,6 @@ public class HiloCliente implements Runnable {
             }
 
         } else if (tipo == TipoAccion.PEDIR_REVANCHA) {
-            // La revancha solo se habilita en el servidor cuando el rival abandona.
             if (puedePedirRevancha && salaActual == null) {
                 SalaJuego.emparejarJugador(this);
             } else {
