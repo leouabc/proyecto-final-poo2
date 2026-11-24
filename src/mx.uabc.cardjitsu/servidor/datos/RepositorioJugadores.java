@@ -9,7 +9,6 @@ import java.util.Locale;
 import modelo.HistorialPartida;
 import modelo.JavaBeans;
 
-/** Acceso sincronizado a DB4O. Todas las operaciones comparten el mismo bloqueo. */
 public class RepositorioJugadores {
     private static final Object DB_LOCK = new Object();
 
@@ -32,7 +31,6 @@ public class RepositorioJugadores {
             if (guardada.startsWith("PBKDF2$")) {
                 return PasswordUtil.verificar(contra, guardada) ? encontrado : null;
             }
-            // Migra cuentas de la versión antigua que guardaba contraseñas sin hash.
             if (guardada.equals(contra)) {
                 encontrado.setContra(PasswordUtil.hash(contra));
                 ObjectContainer db = ManejadorDB4O.getConexion();
@@ -59,7 +57,7 @@ public class RepositorioJugadores {
         return resultados.hasNext() ? resultados.next() : null;
     }
 
-    /** Compatibilidad con llamadas de versiones anteriores. */
+
     public void actualizarResultadoPartida(String nombre, boolean gano) {
         synchronized (DB_LOCK) {
             JavaBeans jugador = buscarPorNombreInterno(nombre);
@@ -71,7 +69,6 @@ public class RepositorioJugadores {
         }
     }
 
-    /** Actualiza ambas estadísticas y guarda el historial en una sola transacción lógica. */
     public boolean registrarResultadoCompleto(HistorialPartida historial) {
         if (historial == null || esVacio(historial.getJugador1()) || esVacio(historial.getJugador2())
                 || esVacio(historial.getGanador()) || esVacio(historial.getPerdedor())) return false;
@@ -98,7 +95,6 @@ public class RepositorioJugadores {
         }
     }
 
-    /** Devuelve el historial del jugador sin exponer credenciales de sus perfiles. */
     public List<HistorialPartida> obtenerHistorialJugador(String nombre) {
         List<HistorialPartida> resultado = new ArrayList<>();
         if (esVacio(nombre)) return resultado;
